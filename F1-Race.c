@@ -123,7 +123,7 @@
 	f1race_key_right_pressed   = SDL_FALSE;          \
 	if(f1race_is_crashing == SDL_TRUE)               \
 		return;                                      \
-}                                                    \
+}
 
 #define F1RACE_GET_NUMBER_IMAGE(value, image)        \
 {                                                    \
