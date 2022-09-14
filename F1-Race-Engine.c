@@ -9,12 +9,13 @@
  *   MIT
  *
  * History:
- *   14-Sep-2022: ~~~~~~
+ *   14-Sep-2022: Implement audio support.
  *   13-Sep-2022: Initial draft/demo version.
  *
  * Compile command:
  *
  *   $ clear && clear && gcc F1-Race-Engine.c -o F1-Race -lSDL2 -lSDL2_mixer && strip -s F1-Race && ./F1-Race
+ *   $ emcc F1-Race-Engine.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
  *
  * Create header file with resources:
  *
@@ -29,6 +30,7 @@
  *   $ timidity *.mid -Ow
  *   $ ffmpeg -i *.wav -acodec pcm_s16le -ar 11025 -ac 1 *_low.wav
  *   $ ffmpeg -i *.wav -ar 44100 -ac 1 -b:a 64k *.mp3
+ *   $ ffmpeg -i *.wav -c:a libvorbis -ac 1 -b:a 64k *.ogg
  */
 
 #include "Resources.h"
@@ -246,7 +248,7 @@ static void F1Race_DrawBitmap(void *memory, uint32_t length, int32_t x, int32_t 
 /* Not Working */
 static void F1Race_LoadSfx(void *memory, uint32_t length, Mix_Music *music) {
 	SDL_RWops* sound_rwops = SDL_RWFromConstMem(memory, length);
-	music = Mix_LoadMUSType_RW(sound_rwops, MUS_MP3, SDL_FALSE);
+	music = Mix_LoadMUSType_RW(sound_rwops, MUS_OGG, SDL_FALSE);
 	SDL_FreeRW(sound_rwops);
 }
 
@@ -1063,7 +1065,7 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	}
 
 	int result = 0;
-	if (MIX_INIT_MP3 != (result = Mix_Init(MIX_INIT_MP3))) {
+	if (MIX_INIT_OGG != (result = Mix_Init(MIX_INIT_OGG))) {
 		fprintf(stderr, "Mix_Init Error: %s\n", Mix_GetError());
 		return EXIT_FAILURE;
 	}
@@ -1072,11 +1074,11 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	music_background = Mix_LoadMUS("audio/background_old.mp3");
-	music_crash = Mix_LoadMUS("audio/crash.mp3");
-//	F1Race_LoadSfx(assets_background_old_mp3, assets_background_old_mp3_len, music_background);
-//	F1Race_LoadSfx(assets_background_new_mp3, assets_background_new_mp3_len, music_background);
-//	F1Race_LoadSfx(assets_crash_mp3, assets_crash_mp3_len, music_crash);
+	music_background = Mix_LoadMUS("audio/background_old.ogg");
+	music_crash = Mix_LoadMUS("audio/crash.ogg");
+//	F1Race_LoadSfx(assets_background_old_ogg, assets_background_old_ogg_len, music_background);
+//	F1Race_LoadSfx(assets_background_new_ogg, assets_background_new_ogg_len, music_background);
+//	F1Race_LoadSfx(assets_crash_ogg, assets_crash_ogg_len, music_crash);
 
 	SDL_Texture *texture = SDL_CreateTexture(render, SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET, TEXTURE_WIDTH, TEXTURE_HEIGHT);
