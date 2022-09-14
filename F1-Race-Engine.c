@@ -14,7 +14,7 @@
  *
  * Compile command:
  *
- *   $ clear && clear && gcc F1-Race-Engine.c -o F1-Race -lSDL2 && ./F1-Race
+ *   $ clear && clear && gcc F1-Race-Engine.c -o F1-Race -lSDL2 -lSDL2_mixer && strip -s F1-Race && ./F1-Race
  *
  * Create header file with resources:
  *
@@ -24,11 +24,17 @@
  *
  *   $ find -name "*.gif" -exec sh -c 'ffmpeg -i "$1" `basename $1 .gif`.bmp' sh {} \;
  *   $ find -name "*.gif" -exec sh -c 'convert "$1" `basename $1 .gif`.bmp' sh {} \;
+ *
+ * Convert MIDIs to WAVs and MP3s:
+ *   $ timidity *.mid -Ow
+ *   $ ffmpeg -i *.wav -acodec pcm_s16le -ar 11025 -ac 1 *_low.wav
+ *   $ ffmpeg -i *.wav -ar 44100 -ac 1 -b:a 64k *.mp3
  */
 
 #include "Resources.h"
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -195,6 +201,9 @@ typedef struct {
 static SDL_bool exit_main_loop = SDL_FALSE;
 static SDL_Renderer* render = NULL;
 
+static Mix_Music *music_background = NULL;
+static Mix_Music *music_crash = NULL;
+
 static SDL_bool f1race_is_new_game = SDL_TRUE;
 static SDL_bool f1race_is_crashing = SDL_FALSE;
 static int16_t f1race_crashing_count_down;
@@ -231,6 +240,18 @@ static void F1Race_DrawBitmap(void *memory, uint32_t length, int32_t x, int32_t 
 
 	SDL_FreeSurface(bitmap);
 	SDL_DestroyTexture(texture);
+	SDL_FreeRW(bitmap_rwops);
+}
+
+/* Not Working */
+static void F1Race_LoadSfx(void *memory, uint32_t length, Mix_Music *music) {
+	SDL_RWops* sound_rwops = SDL_RWFromConstMem(memory, length);
+	music = Mix_LoadMUSType_RW(sound_rwops, MUS_MP3, SDL_FALSE);
+	SDL_FreeRW(sound_rwops);
+}
+
+static void F1Race_PlaySfx(Mix_Music *music, int32_t loop) {
+	Mix_PlayMusic(music, loop);
 }
 
 static void F1Race_Render_Separator(void) {
@@ -600,9 +621,10 @@ static void F1Race_Main(void) {
 		f1race_is_new_game = SDL_FALSE;
 	}
 
-	/* Render First Frame */
 	F1Race_Render_Background();
 	F1Race_Render();
+
+	F1Race_PlaySfx(music_background, -1);
 
 	/*
 	GFX_OPEN_BACKGROUND_SOUND(F1RaceBackGround, F1RACEBACKGROUND, background_midi);
@@ -721,6 +743,9 @@ static void F1Race_Crashing(void) {
 
 	GFX_PLAY_VIBRATION();
 #endif
+
+	F1Race_PlaySfx(music_crash, 0);
+
 	f1race_is_crashing = SDL_TRUE;
 	f1race_crashing_count_down = 10;
 }
@@ -1017,7 +1042,7 @@ static void F1Race_Cyclic_Timer(void) {
 int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	srand(time(0));
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
 		fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
 	}
@@ -1036,6 +1061,22 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		SDL_Quit();
 		return EXIT_FAILURE;
 	}
+
+	int result = 0;
+	if (MIX_INIT_MP3 != (result = Mix_Init(MIX_INIT_MP3))) {
+		fprintf(stderr, "Mix_Init Error: %s\n", Mix_GetError());
+		return EXIT_FAILURE;
+	}
+	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048) == -1) {
+		fprintf(stderr, "Mix_OpenAudio Error: %s\n", Mix_GetError());
+		return EXIT_FAILURE;
+	}
+
+	music_background = Mix_LoadMUS("audio/background_old.mp3");
+	music_crash = Mix_LoadMUS("audio/crash.mp3");
+//	F1Race_LoadSfx(assets_background_old_mp3, assets_background_old_mp3_len, music_background);
+//	F1Race_LoadSfx(assets_background_new_mp3, assets_background_new_mp3_len, music_background);
+//	F1Race_LoadSfx(assets_crash_mp3, assets_crash_mp3_len, music_crash);
 
 	SDL_Texture *texture = SDL_CreateTexture(render, SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET, TEXTURE_WIDTH, TEXTURE_HEIGHT);
@@ -1071,6 +1112,12 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		SDL_RenderPresent(render);
 		SDL_Delay(F1RACE_TIMER_ELAPSE);
 	}
+
+	Mix_CloseAudio();
+	if (music_crash)
+		Mix_FreeMusic(music_crash);
+	if (music_background)
+		Mix_FreeMusic(music_background);
 
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(render);
