@@ -1,7 +1,7 @@
 F1 Race
 =======
 
-![Screenshot from Ubuntu 22.04 LTS](images/screenshot.png) ![Screenshot from Chrome](images/screenshot-web.png)
+![Screenshot from Chrome](images/screenshot-web.png)
 
 Port of the game from MTK OS to SDL2 and Emscripten.
 
@@ -32,4 +32,4 @@ $ make web
 
 ## Other Information
 
-Thanks to @nehochupechatat for source.
+Thanks to [@nehochupechatat](https://github.com/nehochupechatat) for source.
