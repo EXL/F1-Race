@@ -15,7 +15,7 @@
  * Compile command:
  *
  *   $ clear && clear && gcc F1-Race-Engine.c -o F1-Race -lSDL2 -lSDL2_mixer && strip -s F1-Race && ./F1-Race
- *   $ emcc F1-Race-Engine.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
+ *   $ emcc --preload-file assets F1-Race-Engine.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -s USE_OGG=1 -o F1-Race.html
  *
  * Create header file with resources:
  *
@@ -1013,8 +1013,7 @@ static void F1Race_Cyclic_Timer(void) {
 	}
 }
 
-static void main_loop(void *arguments) {
-	CONTEXT_EMSCRIPTEN *context = arguments;
+static void main_loop(SDL_Texture *texture) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
@@ -1029,7 +1028,7 @@ static void main_loop(void *arguments) {
 				break;
 		}
 	}
-	SDL_SetRenderTarget(render, context->texture);
+	SDL_SetRenderTarget(render, texture);
 	F1Race_Cyclic_Timer();
 	SDL_SetRenderTarget(render, NULL);
 	SDL_Rect rectangle;
@@ -1037,10 +1036,17 @@ static void main_loop(void *arguments) {
 	rectangle.y = 0;
 	rectangle.w = WINDOW_WIDTH;
 	rectangle.h = WINDOW_HEIGHT;
-	SDL_RenderCopy(render, context->texture, &rectangle, NULL);
+	SDL_RenderCopy(render, texture, &rectangle, NULL);
 	SDL_RenderPresent(render);
 	SDL_Delay(F1RACE_TIMER_ELAPSE);
 }
+
+#ifdef __EMSCRIPTEN__
+static void main_loop_emscripten(void *arguments) {
+	CONTEXT_EMSCRIPTEN *context = arguments;
+	main_loop(context->texture);
+}
+#endif
 
 int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	srand(time(0));
@@ -1089,37 +1095,12 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	SDL_SetRenderTarget(render, NULL);
 
 #ifndef __EMSCRIPTEN__
-	while (!exit_main_loop) {
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			switch (event.type) {
-				case SDL_QUIT:
-					exit_main_loop = SDL_TRUE;
-					break;
-				case SDL_KEYDOWN:
-					F1Race_Keyboard_Key_Handler(event.key.keysym.sym, SDL_TRUE);
-					break;
-				case SDL_KEYUP:
-					F1Race_Keyboard_Key_Handler(event.key.keysym.sym, SDL_FALSE);
-					break;
-			}
-		}
-		SDL_SetRenderTarget(render, texture);
-		F1Race_Cyclic_Timer();
-		SDL_SetRenderTarget(render, NULL);
-		SDL_Rect rectangle;
-		rectangle.x = 0;
-		rectangle.y = 0;
-		rectangle.w = WINDOW_WIDTH;
-		rectangle.h = WINDOW_HEIGHT;
-		SDL_RenderCopy(render, texture, &rectangle, NULL);
-		SDL_RenderPresent(render);
-		SDL_Delay(F1RACE_TIMER_ELAPSE);
-	}
+	while (!exit_main_loop)
+		main_loop(texture);
 #else
 	CONTEXT_EMSCRIPTEN context;
 	context.texture = texture;
-	emscripten_set_main_loop_arg(main_loop, &context, -1, 1);
+	emscripten_set_main_loop_arg(main_loop_emscripten, &context, -1, 1);
 #endif
 
 	Mix_CloseAudio();
