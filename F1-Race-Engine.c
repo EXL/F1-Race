@@ -1,13 +1,29 @@
 /*
- * Useful commands:
+ * About:
+ *   Port the "F1 Race" game from MTK OS to SDL2 library and Web using Emscripten.
+ *
+ * Author:
+ *   nehochupechatat, EXL
+ *
+ * License:
+ *   MIT
+ *
+ * History:
+ *   14-Sep-2022: ~~~~~~
+ *   13-Sep-2022: Initial draft/demo version.
+ *
+ * Compile command:
  *
  *   $ gcc F1-Race-Engine.c -o F1-Race -lSDL2
+ *
+ * Create header file with resources:
+ *
  *   $ rm Resources.h ; find assets/ -type f -exec xxd -i {} >> Resources.h \;
  *
- *   $ ffmpeg -i GAME_F1RACE_STATUS_SCORE.gif GAME_F1RACE_STATUS_SCORE.bmp
- *   $ convert GAME_F1RACE_STATUS_SCORE.gif GAME_F1RACE_STATUS_SCORE.bmp
+ * Convert GIFs to BMPs using ImageMagick and FFmpeg utilities:
  *
  *   $ find -name "*.gif" -exec sh -c 'ffmpeg -i "$1" `basename $1 .gif`.bmp' sh {} \;
+ *   $ find -name "*.gif" -exec sh -c 'convert "$1" `basename $1 .gif`.bmp' sh {} \;
  */
 
 #include "Resources.h"
@@ -174,9 +190,9 @@ static SDL_Renderer* render = NULL;
 
 static SDL_bool f1race_is_new_game = SDL_TRUE;
 static SDL_bool f1race_is_crashing = SDL_FALSE;
+static int16_t f1race_crashing_count_down;
 static int16_t f1race_separator_0_block_start_y;
 static int16_t f1race_separator_1_block_start_y;
-
 static int16_t f1race_last_car_road;
 static SDL_bool f1race_player_is_car_fly;
 static int16_t f1race_player_car_fly_duration;
@@ -306,7 +322,6 @@ static void F1Race_Render_Status(void) {
 	y_pos = F1RACE_DISPLAY_START_Y + 52;
 
 	score = f1race_score;
-	score = 1235;
 	value = score % 10;
 	remain = score / 10;
 
@@ -395,11 +410,19 @@ static void F1Race_Render_Opposite_Car(void) {
 	int16_t index;
 	for (index = 0; index < F1RACE_OPPOSITE_CAR_COUNT; index++) {
 		if (f1race_opposite_car[index].is_empty == SDL_FALSE)
+
+//			F1Race_DrawBitmap(assets_GAME_F1RACE_PLAYER_CAR_bmp, assets_GAME_F1RACE_PLAYER_CAR_bmp_len,
+//				f1race_opposite_car[index].pos_x, f1race_opposite_car[index].pos_y);
+
 			F1Race_DrawBitmap(f1race_opposite_car[index].image, f1race_opposite_car[index].length,
 				f1race_opposite_car[index].pos_x, f1race_opposite_car[index].pos_y);
 	}
 }
 
+static void F1Race_Render_Player_Car_Crash(void) {
+	F1Race_DrawBitmap(assets_GAME_F1RACE_PLAYER_CAR_CRASH_bmp, assets_GAME_F1RACE_PLAYER_CAR_CRASH_bmp_len,
+		f1race_player_car.pos_x, f1race_player_car.pos_y - 5);
+}
 
 static void F1Race_Render(void) {
 //	gui_set_clip(F1RACE_STATUS_START_X, F1RACE_DISPLAY_START_Y, F1RACE_STATUS_END_X, F1RACE_DISPLAY_END_Y);
@@ -640,8 +663,328 @@ static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
 		case SDLK_KP_8:
 			(key_state) ? F1Race_Key_Down_Pressed() : F1Race_Key_Down_Released();
 			break;
-
+		case SDLK_ESCAPE:
+			if (key_state)
+				exit_main_loop = SDL_TRUE;
+			break;
 	}
+}
+
+/* === LOGIC CODE === */
+
+static void F1Race_Crashing(void) {
+#if 0
+#ifdef __MMI_GAME_MULTICHANNEL_SOUND__
+	/*----------------------------------------------------------------*/
+	/* Local Variables                                                */
+	/*----------------------------------------------------------------*/
+
+	/*----------------------------------------------------------------*/
+	/* Code Body                                                      */
+	/*----------------------------------------------------------------*/
+	GFX_STOP_MULTICHANNEL_MIDI(crash_midi);
+
+	GFX_PLAY_MULTICHANNEL_MIDI(crash_midi);
+#else /* __MMI_GAME_MULTICHANNEL_SOUND__ */
+	GFX_PLAY_AUDIO_MIDI(F1RaceCrash, F1RACECRASH, DEVICE_AUDIO_PLAY_ONCE);
+#endif /* __MMI_GAME_MULTICHANNEL_SOUND__ */
+
+	GFX_PLAY_VIBRATION();
+#endif
+	f1race_is_crashing = SDL_TRUE;
+	f1race_crashing_count_down = 10;
+}
+
+static void F1Race_New_Opposite_Car(void) {
+	int16_t index;
+	int16_t validIndex = 0;
+	int16_t no_slot;
+	int16_t car_type = 0;
+	uint16_t road;
+	int16_t car_pos_x = 0;
+	int16_t car_shift;
+	int16_t enough_space;
+	int16_t rand_num;
+	int16_t speed_add;
+
+	no_slot = SDL_TRUE;
+	if ((rand() % F1RACE_OPPOSITE_CAR_DEFAULT_APPEAR_RATE) == 0) {
+		for (index = 0; index < F1RACE_OPPOSITE_CAR_COUNT; index++) {
+			if (f1race_opposite_car[index].is_empty != SDL_FALSE) {
+				validIndex = index;
+				no_slot = SDL_FALSE;
+				break;
+			}
+		}
+	}
+
+	if (no_slot != SDL_FALSE)
+		return;
+
+	road = rand() % 3;
+
+	if (road == f1race_last_car_road) {
+		road++;
+		road %= 3;
+	}
+
+	if (f1race_level < 3) {
+		rand_num = rand() % 11;
+		switch (rand_num) {
+			case 0:
+			case 1:
+				car_type = 0;
+				break;
+			case 2:
+			case 3:
+			case 4:
+				car_type = 1;
+				break;
+			case 5:
+				car_type = 2;
+				break;
+			case 6:
+			case 7:
+				car_type = 3;
+				break;
+			case 8:
+				car_type = 4;
+				break;
+			case 9:
+				car_type = 5;
+				break;
+			case 10:
+				car_type = 6;
+				break;
+		}
+	}
+
+	if (f1race_level >= 3) {
+		rand_num = rand() % 11;
+		switch (rand_num) {
+			case 0:
+				car_type = 0;
+				break;
+			case 1:
+			case 2:
+				car_type = 1;
+				break;
+			case 3:
+			case 4:
+				car_type = 2;
+				break;
+			case 5:
+			case 6:
+				car_type = 3;
+				break;
+			case 7:
+				car_type = 4;
+				break;
+			case 8:
+			case 9:
+				car_type = 5;
+				break;
+			case 10:
+				car_type = 6;
+				break;
+		}
+	}
+	enough_space = SDL_TRUE;
+	for (index = 0; index < F1RACE_OPPOSITE_CAR_COUNT; index++) {
+		if ((f1race_opposite_car[index].is_empty == SDL_FALSE) &&
+			(f1race_opposite_car[index].pos_y < (F1RACE_PLAYER_CAR_IMAGE_SIZE_Y * 1.5)))
+			enough_space = SDL_FALSE;
+	}
+
+	if (enough_space == SDL_FALSE)
+		return;
+
+	speed_add = f1race_level - 1;
+
+	f1race_opposite_car[validIndex].is_empty = SDL_FALSE;
+	f1race_opposite_car[validIndex].is_add_score = SDL_FALSE;
+	f1race_opposite_car[validIndex].dx = f1race_opposite_car_type[car_type].dx;
+	f1race_opposite_car[validIndex].dy = f1race_opposite_car_type[car_type].dy;
+	f1race_opposite_car[validIndex].speed = f1race_opposite_car_type[car_type].speed + speed_add;
+	f1race_opposite_car[validIndex].dx_from_road = f1race_opposite_car_type[car_type].dx_from_road;
+	f1race_opposite_car[validIndex].image = f1race_opposite_car_type[car_type].image;
+	f1race_opposite_car[validIndex].length = f1race_opposite_car_type[car_type].length;
+
+	car_shift = f1race_opposite_car[validIndex].dx_from_road;
+
+	switch (road) {
+	case 0:
+		car_pos_x = F1RACE_ROAD_0_START_X + car_shift;
+		break;
+	case 1:
+		car_pos_x = F1RACE_ROAD_1_START_X + car_shift;
+		break;
+	case 2:
+		car_pos_x = F1RACE_ROAD_2_START_X + car_shift;
+		break;
+	}
+
+	f1race_opposite_car[validIndex].pos_x = car_pos_x;
+	f1race_opposite_car[validIndex].pos_y = F1RACE_DISPLAY_START_Y - f1race_opposite_car[validIndex].dy;
+	f1race_opposite_car[validIndex].road_id = (uint16_t) road;
+
+	f1race_last_car_road = road;
+}
+
+static void F1Race_CollisionCheck(void) {
+	int16_t index;
+	int16_t minA_x, minA_y, maxA_x, maxA_y;
+	int16_t minB_x, minB_y, maxB_x, maxB_y;
+
+	minA_x = f1race_player_car.pos_x - 1;
+	maxA_x = minA_x + f1race_player_car.dx - 1;
+	minA_y = f1race_player_car.pos_y - 1;
+	maxA_y = minA_y + f1race_player_car.dy - 1;
+
+	for (index = 0; index < F1RACE_OPPOSITE_CAR_COUNT; index++) {
+		if (f1race_opposite_car[index].is_empty == SDL_FALSE) {
+			minB_x = f1race_opposite_car[index].pos_x - 1;
+			maxB_x = minB_x + f1race_opposite_car[index].dx - 1;
+			minB_y = f1race_opposite_car[index].pos_y - 1;
+			maxB_y = minB_y + f1race_opposite_car[index].dy - 1;
+			if (((minA_x <= minB_x) && (minB_x <= maxA_x)) || ((minA_x <= maxB_x) && (maxB_x <= maxA_x))) {
+				if (((minA_y <= minB_y) && (minB_y <= maxA_y)) || ((minA_y <= maxB_y) && (maxB_y <= maxA_y))) {
+					F1Race_Crashing();
+					return;
+				}
+			}
+
+			if ((minA_x >= minB_x) && (minA_x <= maxB_x) && (minA_y >= minB_y) && (minA_y <= maxB_y)) {
+				F1Race_Crashing();
+				return;
+			}
+
+			if ((minA_x >= minB_x) && (minA_x <= maxB_x) && (maxA_y >= minB_y) && (maxA_y <= maxB_y)) {
+				F1Race_Crashing();
+				return;
+			}
+
+			if ((maxA_x >= minB_x) && (maxA_x <= maxB_x) && (minA_y >= minB_y) && (minA_y <= maxB_y)) {
+				F1Race_Crashing();
+				return;
+			}
+
+			if ((maxA_x >= minB_x) && (maxA_x <= maxB_x) && (maxA_y >= minB_y) && (maxA_y <= maxB_y)) {
+				F1Race_Crashing();
+				return;
+			}
+
+			if ((maxA_y < minB_y) && (f1race_opposite_car[index].is_add_score == SDL_FALSE)) {
+				f1race_score++;
+				f1race_pass++;
+				f1race_opposite_car[index].is_add_score = SDL_TRUE;
+
+				if (f1race_pass == 10)
+					f1race_level++; /* level 2 */
+				else if (f1race_pass == 20)
+					f1race_level++; /* level 3 */
+				else if (f1race_pass == 30)
+					f1race_level++; /* level 4 */
+				else if (f1race_pass == 40)
+					f1race_level++; /* level 5 */
+				else if (f1race_pass == 50)
+					f1race_level++; /* level 6 */
+				else if (f1race_pass == 60)
+					f1race_level++; /* level 7 */
+				else if (f1race_pass == 70)
+					f1race_level++; /* level 8 */
+				else if (f1race_pass == 100)
+					f1race_level++; /* level 9 */
+
+				f1race_fly_charger_count++;
+				if (f1race_fly_charger_count >= 6) {
+					if (f1race_fly_count < F1RACE_MAX_FLY_COUNT) {
+						f1race_fly_charger_count = 0;
+						f1race_fly_count++;
+					} else
+						f1race_fly_charger_count--;
+				}
+			}
+		}
+	}
+}
+
+static void F1Race_Framemove(void) {
+	int16_t shift;
+	int16_t max;
+	int16_t index;
+
+	f1race_player_car_fly_duration++;
+	if (f1race_player_car_fly_duration == F1RACE_PLAYER_CAR_FLY_FRAME_COUNT)
+		f1race_player_is_car_fly = SDL_FALSE;
+
+	shift = F1RACE_PLAYER_CAR_SHIFT;
+	if (f1race_key_up_pressed) {
+		if (f1race_player_car.pos_y - shift < F1RACE_DISPLAY_START_Y)
+			shift = f1race_player_car.pos_y - F1RACE_DISPLAY_START_Y - 1;
+		if (f1race_player_is_car_fly == SDL_FALSE)
+			f1race_player_car.pos_y -= shift;
+	}
+
+	if (f1race_key_down_pressed) {
+		max = f1race_player_car.pos_y + f1race_player_car.dy;
+		if (max + shift > F1RACE_DISPLAY_END_Y)
+			shift = F1RACE_DISPLAY_END_Y - max;
+		if (f1race_player_is_car_fly == SDL_FALSE)
+			f1race_player_car.pos_y += shift;
+	}
+
+	if (f1race_key_right_pressed) {
+		max = f1race_player_car.pos_x + f1race_player_car.dx;
+		if (max + shift > F1RACE_ROAD_2_END_X)
+			shift = F1RACE_ROAD_2_END_X - max;
+		f1race_player_car.pos_x += shift;
+	}
+
+	if (f1race_key_left_pressed) {
+		if (f1race_player_car.pos_x - shift < F1RACE_ROAD_0_START_X)
+			shift = f1race_player_car.pos_x - F1RACE_ROAD_0_START_X - 1;
+		f1race_player_car.pos_x -= shift;
+	}
+
+	for (index = 0; index < F1RACE_OPPOSITE_CAR_COUNT; index++) {
+		if (f1race_opposite_car[index].is_empty == SDL_FALSE) {
+			f1race_opposite_car[index].pos_y += f1race_opposite_car[index].speed;
+			if (f1race_opposite_car[index].pos_y > (F1RACE_DISPLAY_END_Y + f1race_opposite_car[index].dy))
+				f1race_opposite_car[index].is_empty = SDL_TRUE;
+		}
+	}
+
+	if (f1race_player_is_car_fly != SDL_FALSE) {
+		shift = F1RACE_PLAYER_CAR_FLY_SHIFT;
+		if (f1race_player_car.pos_y - shift < F1RACE_DISPLAY_START_Y)
+			shift = f1race_player_car.pos_y - F1RACE_DISPLAY_START_Y - 1;
+		f1race_player_car.pos_y -= shift;
+	} else
+		F1Race_CollisionCheck();
+
+	F1Race_New_Opposite_Car();
+}
+
+/* === END LOGIC CODE === */
+
+static void F1Race_Cyclic_Timer(void) {
+	// gui_start_timer(F1RACE_TIMER_ELAPSE, F1Race_Cyclic_Timer);
+	if (f1race_is_crashing == SDL_FALSE) {
+		F1Race_Framemove();
+		F1Race_Render();
+	} else {
+		f1race_crashing_count_down--;
+		F1Race_Render_Player_Car_Crash();
+		if (f1race_crashing_count_down <= 0) {
+			f1race_is_crashing = SDL_FALSE;
+			f1race_is_new_game = SDL_TRUE;
+
+			exit_main_loop = SDL_TRUE;
+			// mmi_gfx_entry_gameover_screen(); // ????? TODO:
+		}
+	}
+//	gui_BLT_double_buffer(0, 0, 127, 127);
 }
 
 int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
@@ -682,11 +1025,9 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 					break;
 			}
 		}
-
-		F1Race_Render();
-
+		F1Race_Cyclic_Timer();
 		SDL_RenderPresent(render);
-		SDL_Delay(100); // TODO: Delay?
+		SDL_Delay(F1RACE_TIMER_ELAPSE);
 	}
 
 	SDL_DestroyRenderer(render);
