@@ -656,6 +656,17 @@ static void F1Race_Key_Down_Released(void) {
 	f1race_key_down_pressed = SDL_FALSE;
 }
 
+static void F1Race_Key_Fly_Pressed(void) {
+	if (f1race_player_is_car_fly != SDL_FALSE)
+		return;
+
+	if (f1race_fly_count > 0) {
+		f1race_player_is_car_fly = SDL_TRUE;
+		f1race_player_car_fly_duration = 0;
+		f1race_fly_count--;
+	}
+}
+
 static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
 	switch (vkey_code) {
 		case SDLK_LEFT:
@@ -674,10 +685,17 @@ static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
 		case SDLK_KP_8:
 			(key_state) ? F1Race_Key_Down_Pressed() : F1Race_Key_Down_Released();
 			break;
+		case SDLK_SPACE:
+		case SDLK_RETURN:
+		case SDLK_KP_ENTER:
+		case SDLK_KP_5:
+			if (key_state)
+				F1Race_Key_Fly_Pressed();
+				break;
 		case SDLK_ESCAPE:
 			if (key_state)
 				exit_main_loop = SDL_TRUE;
-			break;
+				break;
 	}
 }
 
