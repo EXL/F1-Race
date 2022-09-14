@@ -32,8 +32,9 @@
  *   $ ffmpeg -i *.wav -ar 44100 -ac 1 -b:a 64k *.mp3
  *   $ ffmpeg -i *.wav -c:a libvorbis -ac 1 -b:a 64k *.ogg
  */
-
-// #include "Resources.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
@@ -43,8 +44,6 @@
 #include <stdint.h>
 
 #include <time.h>
-
-// #include <emscripten.h>
 
 #define WINDOW_WIDTH                               (256)
 #define WINDOW_HEIGHT                              (256)
@@ -189,6 +188,12 @@ typedef struct {
 	SDL_bool is_empty;
 	SDL_bool is_add_score;
 } F1RACE_OPPOSITE_CAR_STRUCT;
+
+#ifdef __EMSCRIPTEN__
+typedef struct {
+	SDL_Texture *texture;
+} CONTEXT_EMSCRIPTEN;
+#endif
 
 static SDL_bool exit_main_loop = SDL_FALSE;
 static SDL_Renderer *render = NULL;
@@ -1008,6 +1013,35 @@ static void F1Race_Cyclic_Timer(void) {
 	}
 }
 
+static void main_loop(void *arguments) {
+	CONTEXT_EMSCRIPTEN *context = arguments;
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT:
+				exit_main_loop = SDL_TRUE;
+				break;
+			case SDL_KEYDOWN:
+				F1Race_Keyboard_Key_Handler(event.key.keysym.sym, SDL_TRUE);
+				break;
+			case SDL_KEYUP:
+				F1Race_Keyboard_Key_Handler(event.key.keysym.sym, SDL_FALSE);
+				break;
+		}
+	}
+	SDL_SetRenderTarget(render, context->texture);
+	F1Race_Cyclic_Timer();
+	SDL_SetRenderTarget(render, NULL);
+	SDL_Rect rectangle;
+	rectangle.x = 0;
+	rectangle.y = 0;
+	rectangle.w = WINDOW_WIDTH;
+	rectangle.h = WINDOW_HEIGHT;
+	SDL_RenderCopy(render, context->texture, &rectangle, NULL);
+	SDL_RenderPresent(render);
+	SDL_Delay(F1RACE_TIMER_ELAPSE);
+}
+
 int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	srand(time(0));
 
@@ -1054,6 +1088,7 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	F1Race_Main();
 	SDL_SetRenderTarget(render, NULL);
 
+#ifndef __EMSCRIPTEN__
 	while (!exit_main_loop) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
@@ -1081,6 +1116,11 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		SDL_RenderPresent(render);
 		SDL_Delay(F1RACE_TIMER_ELAPSE);
 	}
+#else
+	CONTEXT_EMSCRIPTEN context;
+	context.texture = texture;
+	emscripten_set_main_loop_arg(main_loop, &context, -1, 1);
+#endif
 
 	Mix_CloseAudio();
 	if (music_crash)
