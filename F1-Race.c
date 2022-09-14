@@ -9,13 +9,15 @@
  *   MIT
  *
  * History:
+ *   14-Sep-2022: Implement Emscripten support.
+ *   14-Sep-2022: Resize texture to x2.
  *   14-Sep-2022: Implement audio support.
  *   13-Sep-2022: Initial draft/demo version.
  *
- * Compile command:
+ * Compile commands:
  *
  *   $ clear && clear && gcc F1-Race.c -o F1-Race -lSDL2 -lSDL2_mixer && strip -s F1-Race && ./F1-Race
- *   $ emcc --preload-file assets F1-Race.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
+ *   $ emcc --use-preload-plugins --preload-file assets F1-Race.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
  *
  * Create header file with resources:
  *
@@ -32,6 +34,7 @@
  *   $ ffmpeg -i *.wav -ar 44100 -ac 1 -b:a 64k *.mp3
  *   $ ffmpeg -i *.wav -c:a libvorbis -ac 1 -b:a 64k *.ogg
  */
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif

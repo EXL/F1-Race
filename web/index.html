@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>F1 Race</title>
+	</head>
+	<body>
+		<table style="margin: 10px">
+			<tbody>
+				<tr>
+					<td>
+						<canvas id="canvas" oncontextmenu="event.preventDefault()" width="256" height="256"></canvas>
+					</td>
+					<td style="padding-left: 25px">
+						<h3>F1 Race</h3>
+						<p>Port of the game from MTK OS to SDL2 and Emscripten.</p>
+						<p><strong>Controls:</strong></p>
+						<p>Arrows and 4, 6, 8, 2 on Keypad &ndash; Movement.<br/>Space, Return and 5 on Keypad &ndash; Fly.</p>
+						<p><strong>Source code:</strong></p>
+						<p><a href="https://github.com/EXL/F1-Race" title="F1-Race GitHub Repository" target="_blank">https://github.com/EXL/F1-Race</a></p>
+						<p><strong><em>&#169; EXL and nehochupechatat, 14-Sep-2022</strong></em></p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<script type='text/javascript'>
+			var Module = {
+				canvas: (function() { return document.getElementById('canvas'); })()
+			};
+		</script>
+		<script src="F1-Race.js"></script>
+	</body>
+</html>
