@@ -14,6 +14,16 @@ Port of the game from MTK OS to SDL2 and Emscripten.
 
 * [F1 Race](https://baat.exlmoto.ru/f1/).
 
+## Build for Windows
+
+Install [MSYS2](https://www.msys2.org/) first and run "MSYS2 MINGW64" shell.
+
+```sh
+$ pacman -S mingw-w64-x86_64-make mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer
+make windows
+make windows-static # Alternative, maybe broken over time.
+```
+
 ## Build for Linux
 
 ```sh
