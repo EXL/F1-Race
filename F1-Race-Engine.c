@@ -82,24 +82,70 @@
 #define F1RACE_STATUS_START_X                      (F1RACE_GRASS_1_START_X + F1RACE_GRASS_WIDTH)
 #define F1RACE_STATUS_END_X                        (F1RACE_STATUS_START_X + F1RACE_STATUS_WIDTH)
 
-#define F1RACE_RELEASE_ALL_KEY              \
-{                                           \
-	f1race_key_up_pressed      = SDL_FALSE; \
-	f1race_key_down_pressed    = SDL_FALSE; \
-	f1race_key_left_pressed    = SDL_FALSE; \
-	f1race_key_right_pressed   = SDL_FALSE; \
-	if(f1race_is_crashing == SDL_TRUE)      \
-		return;                             \
-}                                           \
+#define F1RACE_RELEASE_ALL_KEY                       \
+{                                                    \
+	f1race_key_up_pressed      = SDL_FALSE;          \
+	f1race_key_down_pressed    = SDL_FALSE;          \
+	f1race_key_left_pressed    = SDL_FALSE;          \
+	f1race_key_right_pressed   = SDL_FALSE;          \
+	if(f1race_is_crashing == SDL_TRUE)               \
+		return;                                      \
+}                                                    \
+
+#define F1RACE_GET_NUMBER_IMAGE(value, image, len)   \
+{                                                    \
+   switch(value) {                                   \
+   case 0:                                           \
+      image = assets_GAME_F1RACE_NUMBER_0_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_0_bmp_len;     \
+      break;                                         \
+   case 1:                                           \
+      image = assets_GAME_F1RACE_NUMBER_1_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_1_bmp_len;     \
+      break;                                         \
+   case 2:                                           \
+      image = assets_GAME_F1RACE_NUMBER_2_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_2_bmp_len;     \
+      break;                                         \
+   case 3:                                           \
+      image = assets_GAME_F1RACE_NUMBER_3_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_3_bmp_len;     \
+      break;                                         \
+   case 4:                                           \
+      image = assets_GAME_F1RACE_NUMBER_4_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_4_bmp_len;     \
+      break;                                         \
+   case 5:                                           \
+      image = assets_GAME_F1RACE_NUMBER_5_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_5_bmp_len;     \
+      break;                                         \
+   case 6:                                           \
+      image = assets_GAME_F1RACE_NUMBER_6_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_6_bmp_len;     \
+      break;                                         \
+   case 7:                                           \
+      image = assets_GAME_F1RACE_NUMBER_7_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_7_bmp_len;     \
+      break;                                         \
+   case 8:                                           \
+      image = assets_GAME_F1RACE_NUMBER_8_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_8_bmp_len;     \
+      break;                                         \
+   case 9:                                           \
+      image = assets_GAME_F1RACE_NUMBER_9_bmp;       \
+      len = assets_GAME_F1RACE_NUMBER_9_bmp_len;     \
+      break;                                         \
+   }                                                 \
+}
 
 typedef struct {
 	int16_t pos_x;
 	int16_t pos_y;
 	int16_t dx;
 	int16_t dy;
-	void* image;
-	void* image_fly;
-	void* image_head_light;
+	void * image;
+	void * image_fly;
+	void * image_head_light;
 } F1RACE_CAR_STRUCT;
 
 typedef struct {
@@ -107,7 +153,7 @@ typedef struct {
 	int16_t dy;
 	int16_t speed;
 	int16_t dx_from_road;
-	void* image;
+	void * image;
 } F1RACE_OPPOSITE_CAR_TYPE_STRUCT;
 
 typedef struct {
@@ -115,7 +161,7 @@ typedef struct {
 	int16_t dy;
 	int16_t speed;
 	int16_t dx_from_road;
-	void* image;
+	void * image;
 	int16_t pos_x;
 	int16_t pos_y;
 	uint8_t road_id;
@@ -149,7 +195,7 @@ static F1RACE_CAR_STRUCT f1race_player_car;
 static F1RACE_OPPOSITE_CAR_TYPE_STRUCT f1race_opposite_car_type[F1RACE_OPPOSITE_CAR_TYPE_COUNT];
 static F1RACE_OPPOSITE_CAR_STRUCT f1race_opposite_car[F1RACE_OPPOSITE_CAR_COUNT];
 
-static void F1Race_DrawBitmap(void *memory, int32_t length, int32_t x, int32_t y) {
+static void F1Race_DrawBitmap(void *memory, uint32_t length, int32_t x, int32_t y) {
 	SDL_RWops* bitmap_rwops = SDL_RWFromConstMem(memory, length);
 	SDL_Surface* bitmap = SDL_LoadBMP_RW(bitmap_rwops, SDL_FALSE);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(render, bitmap);
@@ -237,10 +283,84 @@ static void F1Race_Render_Road(void) {
 	SDL_RenderFillRect(render, &rectangle);
 }
 
+static void F1Race_Render_Status(void) {
+	int16_t x_pos;
+	int16_t y_pos;
+	int16_t value;
+	int16_t remain;
+	int16_t score;
+	int16_t index;
+
+	void * image_id;
+	uint32_t length;
+
+	SDL_Rect rectangle;
+	SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
+	rectangle.x = F1RACE_STATUS_START_X + 4;
+	rectangle.y = F1RACE_DISPLAY_START_Y + 52;
+	rectangle.w = F1RACE_STATUS_START_X + 29 + 1 - rectangle.x;
+	rectangle.h = F1RACE_DISPLAY_START_Y + 58 - rectangle.y;
+	SDL_RenderFillRect(render, &rectangle);
+
+	x_pos = F1RACE_STATUS_START_X + 25;
+	y_pos = F1RACE_DISPLAY_START_Y + 52;
+
+	score = f1race_score;
+	score = 1235;
+	value = score % 10;
+	remain = score / 10;
+
+	while (SDL_TRUE) {
+		F1RACE_GET_NUMBER_IMAGE(value, image_id, length);
+		F1Race_DrawBitmap(image_id, length, x_pos, y_pos);
+
+		x_pos -= 5;
+		if (remain > 0) {
+			value = remain % 10;
+			remain = remain / 10;
+		}
+		else
+			break;
+	}
+
+	SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
+	rectangle.x = F1RACE_STATUS_START_X + 4;
+	rectangle.y = F1RACE_DISPLAY_START_Y + 74;
+	rectangle.w = F1RACE_STATUS_START_X + 29 + 1 - rectangle.x;
+	rectangle.h = F1RACE_DISPLAY_START_Y + 80 - rectangle.y;
+	SDL_RenderFillRect(render, &rectangle);
+
+	x_pos = F1RACE_STATUS_START_X + 16;
+	y_pos = F1RACE_DISPLAY_START_Y + 74;
+
+	F1RACE_GET_NUMBER_IMAGE(f1race_level, image_id, length);
+	F1Race_DrawBitmap(image_id, length, x_pos, y_pos);
+
+	x_pos = F1RACE_STATUS_START_X + 4;
+	y_pos = F1RACE_DISPLAY_START_Y + 102;
+	for (index = 0; index < 5; index++) {
+		if (index < f1race_fly_charger_count)
+			SDL_SetRenderDrawColor(render, 255, 0, 0, 0);
+		else
+			SDL_SetRenderDrawColor(render, 100, 100, 100, 0);
+		rectangle.x = x_pos + index * 4;
+		rectangle.y = y_pos - 2 - index;
+		rectangle.w = x_pos + 2 + index * 4 + 1 - rectangle.x;
+		rectangle.h = y_pos - rectangle.y;
+		SDL_RenderFillRect(render, &rectangle);
+	}
+
+	F1RACE_GET_NUMBER_IMAGE(f1race_fly_count, image_id, length);
+	x_pos = F1RACE_STATUS_START_X + 25;
+	y_pos = F1RACE_DISPLAY_START_Y + 96;
+	F1Race_DrawBitmap(image_id, length, x_pos, y_pos);
+}
+
+
 static void F1Race_Render(void) {
 //	gui_set_clip(F1RACE_STATUS_START_X, F1RACE_DISPLAY_START_Y, F1RACE_STATUS_END_X, F1RACE_DISPLAY_END_Y);
 
-//	F1Race_Render_Status();
+	F1Race_Render_Status();
 
 //	gui_set_clip(F1RACE_ROAD_0_START_X, F1RACE_DISPLAY_START_Y, F1RACE_ROAD_2_END_X, F1RACE_DISPLAY_END_Y);
 	F1Race_Render_Road();
@@ -511,7 +631,7 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 			}
 		}
 
-		F1Race_Render_Background();
+//		F1Race_Render_Background();
 		F1Race_Render();
 
 		SDL_RenderPresent(render);
