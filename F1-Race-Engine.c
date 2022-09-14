@@ -36,6 +36,11 @@
 
 #include <time.h>
 
+#define WINDOW_WIDTH                               (256)
+#define WINDOW_HEIGHT                              (256)
+#define TEXTURE_WIDTH                              (128)
+#define TEXTURE_HEIGHT                             (128)
+
 #define F1RACE_PLAYER_CAR_IMAGE_SIZE_X             (15)
 #define F1RACE_PLAYER_CAR_IMAGE_SIZE_Y             (20)
 #define F1RACE_PLAYER_CAR_CARSH_IMAGE_SIZE_X       (15)
@@ -1025,13 +1030,13 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	}
 
 	SDL_Window* window = SDL_CreateWindow("F1 Race",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 150, 150, SDL_WINDOW_SHOWN); /* TODO: Name and SIZE */
+		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 	if (window == NULL) {
 		fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
 	}
 
-	render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	if (render == NULL) {
 		fprintf(stderr, "SDL_CreateRenderer Error: %s\n", SDL_GetError());
 		SDL_DestroyWindow(window);
@@ -1039,7 +1044,12 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	SDL_Texture *texture = SDL_CreateTexture(render, SDL_PIXELFORMAT_RGBA8888,
+		SDL_TEXTUREACCESS_TARGET, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+	SDL_SetRenderTarget(render, texture);
+	SDL_RenderClear(render);
 	F1Race_Main();
+	SDL_SetRenderTarget(render, NULL);
 
 	while (!exit_main_loop) {
 		SDL_Event event;
@@ -1056,11 +1066,20 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 					break;
 			}
 		}
+		SDL_SetRenderTarget(render, texture);
 		F1Race_Cyclic_Timer();
+		SDL_SetRenderTarget(render, NULL);
+		SDL_Rect rectangle;
+		rectangle.x = 0;
+		rectangle.y = 0;
+		rectangle.w = WINDOW_WIDTH;
+		rectangle.h = WINDOW_HEIGHT;
+		SDL_RenderCopy(render, texture, &rectangle, NULL);
 		SDL_RenderPresent(render);
 		SDL_Delay(F1RACE_TIMER_ELAPSE);
 	}
 
+	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(render);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
