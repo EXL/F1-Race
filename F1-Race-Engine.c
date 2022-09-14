@@ -435,11 +435,7 @@ static void F1Race_Render(void) {
 	rectangle.h = F1RACE_DISPLAY_END_Y - rectangle.y;
 	SDL_RenderSetClipRect(render, &rectangle);
 
-//	gui_set_clip(F1RACE_STATUS_START_X, F1RACE_DISPLAY_START_Y, F1RACE_STATUS_END_X, F1RACE_DISPLAY_END_Y);
-
 	F1Race_Render_Status();
-
-//	gui_set_clip(F1RACE_ROAD_0_START_X, F1RACE_DISPLAY_START_Y, F1RACE_ROAD_2_END_X, F1RACE_DISPLAY_END_Y);
 
 	rectangle.x = F1RACE_ROAD_0_START_X;
 	rectangle.y = F1RACE_DISPLAY_START_Y;
@@ -1003,7 +999,6 @@ static void F1Race_Framemove(void) {
 /* === END LOGIC CODE === */
 
 static void F1Race_Cyclic_Timer(void) {
-	// gui_start_timer(F1RACE_TIMER_ELAPSE, F1Race_Cyclic_Timer);
 	if (f1race_is_crashing == SDL_FALSE) {
 		F1Race_Framemove();
 		F1Race_Render();
@@ -1014,11 +1009,9 @@ static void F1Race_Cyclic_Timer(void) {
 			f1race_is_crashing = SDL_FALSE;
 			f1race_is_new_game = SDL_TRUE;
 
-			exit_main_loop = SDL_TRUE;
-			// mmi_gfx_entry_gameover_screen(); // ????? TODO:
+			F1Race_Main();
 		}
 	}
-//	gui_BLT_double_buffer(0, 0, 127, 127);
 }
 
 int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
