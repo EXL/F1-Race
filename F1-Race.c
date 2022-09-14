@@ -1006,7 +1006,6 @@ static void main_loop(SDL_Texture *texture) {
 	rectangle.h = WINDOW_HEIGHT;
 	SDL_RenderCopy(render, texture, &rectangle, NULL);
 	SDL_RenderPresent(render);
-	SDL_Delay(F1RACE_TIMER_ELAPSE);
 }
 
 #ifdef __EMSCRIPTEN__
@@ -1063,12 +1062,14 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	SDL_SetRenderTarget(render, NULL);
 
 #ifndef __EMSCRIPTEN__
-	while (!exit_main_loop)
+	while (!exit_main_loop) {
 		main_loop(texture);
+		SDL_Delay(F1RACE_TIMER_ELAPSE);
+	}
 #else
 	CONTEXT_EMSCRIPTEN context;
 	context.texture = texture;
-	emscripten_set_main_loop_arg(main_loop_emscripten, &context, -1, 1);
+	emscripten_set_main_loop_arg(main_loop_emscripten, &context, 10, 1);
 #endif
 
 	Mix_CloseAudio();
