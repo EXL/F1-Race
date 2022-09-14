@@ -14,8 +14,8 @@
  *
  * Compile command:
  *
- *   $ clear && clear && gcc F1-Race-Engine.c -o F1-Race -lSDL2 -lSDL2_mixer && strip -s F1-Race && ./F1-Race
- *   $ emcc --preload-file assets F1-Race-Engine.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -s USE_OGG=1 -o F1-Race.html
+ *   $ clear && clear && gcc F1-Race.c -o F1-Race -lSDL2 -lSDL2_mixer && strip -s F1-Race && ./F1-Race
+ *   $ emcc --preload-file assets F1-Race.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
  *
  * Create header file with resources:
  *
@@ -600,22 +600,6 @@ static void F1Race_Main(void) {
 	F1Race_Render();
 
 	F1Race_PlaySfx(music_background, -1);
-
-	/*
-	GFX_OPEN_BACKGROUND_SOUND(F1RaceBackGround, F1RACEBACKGROUND, background_midi);
-	GFX_PLAY_BACKGROUND_SOUND(background_midi);
-
-	GFX_OPEN_DUMMY_BACKGROUND_SOUND();
-	GFX_PLAY_DUMMY_BACKGROUND_SOUND();
-	*/
-
-	// gui_set_clip(0, 0, UI_device_width - 1, UI_device_height - 1);
-	// gui_start_timer(F1RACE_TIMER_ELAPSE, F1Race_Cyclic_Timer);
-	// gui_BLT_double_buffer(0, 0, UI_device_width - 1, UI_device_height - 1);
-
-	if (f1race_is_crashing == SDL_TRUE) {
-		// GFX_PLAY_VIBRATION();
-	}
 }
 
 static void F1Race_Key_Left_Pressed(void) {
@@ -700,25 +684,6 @@ static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
 /* === LOGIC CODE === */
 
 static void F1Race_Crashing(void) {
-#if 0
-#ifdef __MMI_GAME_MULTICHANNEL_SOUND__
-	/*----------------------------------------------------------------*/
-	/* Local Variables                                                */
-	/*----------------------------------------------------------------*/
-
-	/*----------------------------------------------------------------*/
-	/* Code Body                                                      */
-	/*----------------------------------------------------------------*/
-	GFX_STOP_MULTICHANNEL_MIDI(crash_midi);
-
-	GFX_PLAY_MULTICHANNEL_MIDI(crash_midi);
-#else /* __MMI_GAME_MULTICHANNEL_SOUND__ */
-	GFX_PLAY_AUDIO_MIDI(F1RaceCrash, F1RACECRASH, DEVICE_AUDIO_PLAY_ONCE);
-#endif /* __MMI_GAME_MULTICHANNEL_SOUND__ */
-
-	GFX_PLAY_VIBRATION();
-#endif
-
 	F1Race_PlaySfx(music_crash, 0);
 
 	f1race_is_crashing = SDL_TRUE;
@@ -1076,13 +1041,13 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		fprintf(stderr, "Mix_Init Error: %s\n", Mix_GetError());
 		return EXIT_FAILURE;
 	}
-	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048) == -1) {
+	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 1, 4096) == -1) {
 		fprintf(stderr, "Mix_OpenAudio Error: %s\n", Mix_GetError());
 		return EXIT_FAILURE;
 	}
 
-	music_background = Mix_LoadMUS("audio/background_old.ogg");
-	music_crash = Mix_LoadMUS("audio/crash.ogg");
+	music_background = Mix_LoadMUS("assets/background_old.ogg");
+	music_crash = Mix_LoadMUS("assets/crash.ogg");
 //	F1Race_LoadSfx(assets_background_old_ogg, assets_background_old_ogg_len, music_background);
 //	F1Race_LoadSfx(assets_background_new_ogg, assets_background_new_ogg_len, music_background);
 //	F1Race_LoadSfx(assets_crash_ogg, assets_crash_ogg_len, music_crash);
