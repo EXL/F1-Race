@@ -1019,20 +1019,29 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	srand(time(0));
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
-		fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
+		fprintf(stderr, "SDL_Init Error: %s\n.", SDL_GetError());
 		return EXIT_FAILURE;
 	}
 
-	SDL_Window* window = SDL_CreateWindow("F1 Race",
+	SDL_Window *window = SDL_CreateWindow("F1 Race",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 	if (window == NULL) {
-		fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
+		fprintf(stderr, "SDL_CreateWindow Error: %s\n.", SDL_GetError());
 		return EXIT_FAILURE;
+	}
+
+	SDL_Surface *icon = SDL_LoadBMP("assets/race.bmp");
+	if (icon == NULL)
+		fprintf(stderr, "SDL_LoadBMP Error: %s\n.", SDL_GetError());
+	else {
+		SDL_SetColorKey(icon, SDL_TRUE, SDL_MapRGB(icon->format, 36, 227, 113)); // Icon transparent mask.
+		SDL_SetWindowIcon(window, icon);
+		SDL_FreeSurface(icon);
 	}
 
 	render = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 	if (render == NULL) {
-		fprintf(stderr, "SDL_CreateRenderer Error: %s\n", SDL_GetError());
+		fprintf(stderr, "SDL_CreateRenderer Error: %s\n.", SDL_GetError());
 		SDL_DestroyWindow(window);
 		SDL_Quit();
 		return EXIT_FAILURE;
@@ -1040,11 +1049,11 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 
 	int result = 0;
 	if (MIX_INIT_OGG != (result = Mix_Init(MIX_INIT_OGG))) {
-		fprintf(stderr, "Mix_Init Error: %s\n", Mix_GetError());
+		fprintf(stderr, "Mix_Init Error: %s\n.", Mix_GetError());
 		return EXIT_FAILURE;
 	}
 	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 1, 4096) == -1) {
-		fprintf(stderr, "Mix_OpenAudio Error: %s\n", Mix_GetError());
+		fprintf(stderr, "Mix_OpenAudio Error: %s\n.", Mix_GetError());
 		return EXIT_FAILURE;
 	}
 
@@ -1064,12 +1073,12 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 #ifndef __EMSCRIPTEN__
 	while (!exit_main_loop) {
 		main_loop(texture);
-		SDL_Delay(F1RACE_TIMER_ELAPSE);
+		SDL_Delay(F1RACE_TIMER_ELAPSE); // 10 fps.
 	}
 #else
 	CONTEXT_EMSCRIPTEN context;
 	context.texture = texture;
-	emscripten_set_main_loop_arg(main_loop_emscripten, &context, 10, 1);
+	emscripten_set_main_loop_arg(main_loop_emscripten, &context, 10, 1); // 10 fps.
 #endif
 
 	Mix_CloseAudio();
