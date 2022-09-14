@@ -14,7 +14,7 @@
  *
  * Compile command:
  *
- *   $ gcc F1-Race-Engine.c -o F1-Race -lSDL2
+ *   $ clear && clear && gcc F1-Race-Engine.c -o F1-Race -lSDL2 && ./F1-Race
  *
  * Create header file with resources:
  *
@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+
+#include <time.h>
 
 #define F1RACE_PLAYER_CAR_IMAGE_SIZE_X             (15)
 #define F1RACE_PLAYER_CAR_IMAGE_SIZE_Y             (20)
@@ -410,10 +412,6 @@ static void F1Race_Render_Opposite_Car(void) {
 	int16_t index;
 	for (index = 0; index < F1RACE_OPPOSITE_CAR_COUNT; index++) {
 		if (f1race_opposite_car[index].is_empty == SDL_FALSE)
-
-//			F1Race_DrawBitmap(assets_GAME_F1RACE_PLAYER_CAR_bmp, assets_GAME_F1RACE_PLAYER_CAR_bmp_len,
-//				f1race_opposite_car[index].pos_x, f1race_opposite_car[index].pos_y);
-
 			F1Race_DrawBitmap(f1race_opposite_car[index].image, f1race_opposite_car[index].length,
 				f1race_opposite_car[index].pos_x, f1race_opposite_car[index].pos_y);
 	}
@@ -425,11 +423,24 @@ static void F1Race_Render_Player_Car_Crash(void) {
 }
 
 static void F1Race_Render(void) {
+	SDL_Rect rectangle;
+	rectangle.x = F1RACE_STATUS_START_X;
+	rectangle.y = F1RACE_DISPLAY_START_Y;
+	rectangle.w = F1RACE_STATUS_END_X + 1 - rectangle.x;
+	rectangle.h = F1RACE_DISPLAY_END_Y - rectangle.y;
+	SDL_RenderSetClipRect(render, &rectangle);
+
 //	gui_set_clip(F1RACE_STATUS_START_X, F1RACE_DISPLAY_START_Y, F1RACE_STATUS_END_X, F1RACE_DISPLAY_END_Y);
 
 	F1Race_Render_Status();
 
 //	gui_set_clip(F1RACE_ROAD_0_START_X, F1RACE_DISPLAY_START_Y, F1RACE_ROAD_2_END_X, F1RACE_DISPLAY_END_Y);
+
+	rectangle.x = F1RACE_ROAD_0_START_X;
+	rectangle.y = F1RACE_DISPLAY_START_Y;
+	rectangle.w = F1RACE_ROAD_2_END_X + 1 - rectangle.x;
+	rectangle.h = F1RACE_DISPLAY_END_Y - rectangle.y;
+	SDL_RenderSetClipRect(render, &rectangle);
 
 	F1Race_Render_Road();
 	F1Race_Render_Separator();
@@ -988,6 +999,8 @@ static void F1Race_Cyclic_Timer(void) {
 }
 
 int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
+	srand(time(0));
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
 		return EXIT_FAILURE;
