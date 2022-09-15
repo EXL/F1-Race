@@ -14,8 +14,8 @@ build-windows:
 
 build-windows-static:
 	windres -i windows/F1-Race.rc -o F1-Race_res.o --include-dir=.
-	$(CC) -O2 F1-Race.c -o F1-Race.exe F1-Race_res.o `sdl2-config --static-libs` \
-		-lSDL2_mixer -lwinmm -lmpg123 -lopusfile -logg -lopus -lshlwapi -lssp
+	$(CC) -static -static-libgcc -O2 F1-Race.c -o F1-Race.exe F1-Race_res.o \
+		`sdl2-config --static-libs` -lSDL2_mixer -lwinmm -lmpg123 -lopusfile -logg -lopus -lshlwapi -lssp
 	strip -s F1-Race.exe
 
 build-web:
