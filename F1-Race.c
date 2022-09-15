@@ -684,7 +684,7 @@ static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
 		case SDLK_KP_5:
 			if (key_state)
 				F1Race_Key_Fly_Pressed();
-				break;
+			break;
 		case SDLK_n:
 		case SDLK_TAB:
 		case SDLK_KP_0:
@@ -698,18 +698,19 @@ static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
 			break;
 		case SDLK_m:
 		case SDLK_KP_7:
-			if (key_state)
+			if (key_state) {
 				if (volume_old == -1)
 					volume_old = Mix_VolumeMusic(0);
 				else {
 					Mix_VolumeMusic(volume_old);
 					volume_old = -1;
 				}
-				break;
+			}
+			break;
 		case SDLK_ESCAPE:
 			if (key_state)
 				exit_main_loop = SDL_TRUE;
-				break;
+			break;
 	}
 }
 
