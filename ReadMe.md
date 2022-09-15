@@ -14,6 +14,10 @@ Port of the game from MTK OS to SDL2 and Emscripten.
 
 * [F1 Race](https://baat.exlmoto.ru/f1/).
 
+## Download
+
+Ready-to-run game builds are available in the "[Releases](https://github.com/EXL/F1-Race/releases)" section.
+
 ## Run Tips
 
 Linux: Install the SDL2 and SDL2_mixer libraries before starting the game.
