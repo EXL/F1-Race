@@ -1,7 +1,7 @@
 F1 Race
 =======
 
-![Screenshot from Chrome](images/screenshot-web.png)
+![Screenshot from Windows 10](images/screenshot-windows.png)
 
 Port of the game from MTK OS to SDL2 and Emscripten.
 
@@ -39,6 +39,10 @@ Install [Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
 $ source /opt/emsdk/emsdk_env.sh
 $ make build-web
 ```
+
+## TODO
+
+* Implement more detailed Game Over screen with scores when car crashes.
 
 ## Other Information
 
