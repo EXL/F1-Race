@@ -3,12 +3,13 @@
  *   Port the "F1 Race" game from MTK OS to SDL2 library and Web using Emscripten.
  *
  * Author:
- *   nehochupechatat, EXL
+ *   nehochupechatat, OldPhonePreservation, EXL
  *
  * License:
  *   MIT
  *
  * History:
+ *   15-Sep-2022: Added new MIDIs and switching between them.
  *   15-Sep-2022: Added Windows support and icons.
  *   14-Sep-2022: Implemented Emscripten support.
  *   14-Sep-2022: Resized texture to x2.
@@ -33,7 +34,7 @@
  *   $ timidity *.mid -Ow
  *   $ ffmpeg -i *.wav -acodec pcm_s16le -ar 11025 -ac 1 *_low.wav
  *   $ ffmpeg -i *.wav -ar 44100 -ac 1 -b:a 64k *.mp3
- *   $ ffmpeg -i *.wav -c:a libvorbis -ac 1 -b:a 64k *.ogg
+ *   $ ffmpeg -i *.wav -c:a libvorbis -ar 44100 -ac 1 -b:a 64k *.ogg
  */
 
 #ifdef __EMSCRIPTEN__
@@ -200,9 +201,11 @@ typedef struct {
 #endif
 
 static SDL_bool exit_main_loop = SDL_FALSE;
+static SDL_bool using_new_background_ogg = SDL_FALSE;
 static SDL_Renderer *render = NULL;
 
-static Mix_Music *music_background = NULL;
+static Mix_Music *music_background_new = NULL;
+static Mix_Music *music_background_old = NULL;
 static Mix_Music *music_crash = NULL;
 
 static SDL_bool f1race_is_new_game = SDL_TRUE;
@@ -603,7 +606,10 @@ static void F1Race_Main(void) {
 	F1Race_Render_Background();
 	F1Race_Render();
 
-	F1Race_PlaySfx(music_background, -1);
+	if (using_new_background_ogg)
+		F1Race_PlaySfx(music_background_new, -1);
+	else
+		F1Race_PlaySfx(music_background_old, -1);
 }
 
 static void F1Race_Key_Left_Pressed(void) {
@@ -678,6 +684,17 @@ static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
 			if (key_state)
 				F1Race_Key_Fly_Pressed();
 				break;
+		case SDLK_n:
+		case SDLK_TAB:
+		case SDLK_KP_0:
+			if (key_state) {
+				if (!using_new_background_ogg)
+					F1Race_PlaySfx(music_background_new, -1);
+				else
+					F1Race_PlaySfx(music_background_old, -1);
+				using_new_background_ogg = !using_new_background_ogg;
+			}
+			break;
 		case SDLK_ESCAPE:
 			if (key_state)
 				exit_main_loop = SDL_TRUE;
@@ -1058,10 +1075,11 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	music_background = Mix_LoadMUS("assets/background_old.ogg");
+	music_background_new = Mix_LoadMUS("assets/background_new.ogg");
+	music_background_old = Mix_LoadMUS("assets/background_old.ogg");
 	music_crash = Mix_LoadMUS("assets/crash.ogg");
-//	F1Race_LoadSfx(assets_background_old_ogg, assets_background_old_ogg_len, music_background);
-//	F1Race_LoadSfx(assets_background_new_ogg, assets_background_new_ogg_len, music_background);
+//	F1Race_LoadSfx(assets_background_new_ogg, assets_background_new_ogg_len, music_background_new);
+//	F1Race_LoadSfx(assets_background_old_ogg, assets_background_old_ogg_len, music_background_old);
 //	F1Race_LoadSfx(assets_crash_ogg, assets_crash_ogg_len, music_crash);
 
 	SDL_Texture *texture = SDL_CreateTexture(render, SDL_PIXELFORMAT_RGBA8888,
@@ -1085,8 +1103,10 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 	Mix_CloseAudio();
 	if (music_crash)
 		Mix_FreeMusic(music_crash);
-	if (music_background)
-		Mix_FreeMusic(music_background);
+	if (music_background_old)
+		Mix_FreeMusic(music_background_old);
+	if (music_background_new)
+		Mix_FreeMusic(music_background_new);
 
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(render);
