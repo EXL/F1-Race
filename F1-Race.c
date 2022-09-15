@@ -17,16 +17,13 @@
  *   13-Sep-2022: Created initial draft/demo version.
  *
  * Compile commands:
- *
  *   $ clear && clear && gcc F1-Race.c -o F1-Race -lSDL2 -lSDL2_mixer && strip -s F1-Race && ./F1-Race
  *   $ emcc --use-preload-plugins --preload-file assets F1-Race.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
  *
  * Create header file with resources:
- *
  *   $ rm Resources.h ; find assets/ -type f -exec xxd -i {} >> Resources.h \;
  *
  * Convert GIFs to BMPs using ImageMagick and FFmpeg utilities:
- *
  *   $ find -name "*.gif" -exec sh -c 'ffmpeg -i "$1" `basename $1 .gif`.bmp' sh {} \;
  *   $ find -name "*.gif" -exec sh -c 'convert "$1" `basename $1 .gif`.bmp' sh {} \;
  *
