@@ -9,7 +9,7 @@
  *   MIT
  *
  * History:
- *   15-Sep-2022: Added new MIDIs and switching between them.
+ *   15-Sep-2022: Added new MIDIs, switching, and mute.
  *   15-Sep-2022: Added Windows support and icons.
  *   14-Sep-2022: Implemented Emscripten support.
  *   14-Sep-2022: Resized texture to x2.
@@ -207,6 +207,7 @@ static SDL_Renderer *render = NULL;
 static Mix_Music *music_background_new = NULL;
 static Mix_Music *music_background_old = NULL;
 static Mix_Music *music_crash = NULL;
+static int32_t volume_old = -1;
 
 static SDL_bool f1race_is_new_game = SDL_TRUE;
 static SDL_bool f1race_is_crashing = SDL_FALSE;
@@ -695,6 +696,16 @@ static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
 				using_new_background_ogg = !using_new_background_ogg;
 			}
 			break;
+		case SDLK_m:
+		case SDLK_KP_7:
+			if (key_state)
+				if (volume_old == -1)
+					volume_old = Mix_VolumeMusic(0);
+				else {
+					Mix_VolumeMusic(volume_old);
+					volume_old = -1;
+				}
+				break;
 		case SDLK_ESCAPE:
 			if (key_state)
 				exit_main_loop = SDL_TRUE;
