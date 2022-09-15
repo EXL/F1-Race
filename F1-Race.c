@@ -9,10 +9,11 @@
  *   MIT
  *
  * History:
- *   14-Sep-2022: Implement Emscripten support.
- *   14-Sep-2022: Resize texture to x2.
- *   14-Sep-2022: Implement audio support.
- *   13-Sep-2022: Initial draft/demo version.
+ *   15-Sep-2022: Added Windows support and icons.
+ *   14-Sep-2022: Implemented Emscripten support.
+ *   14-Sep-2022: Resized texture to x2.
+ *   14-Sep-2022: Implemented audio support.
+ *   13-Sep-2022: Created initial draft/demo version.
  *
  * Compile commands:
  *

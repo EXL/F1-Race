@@ -1,6 +1,7 @@
-Original-Leaked
 *.wav
-F1-Race
+F1-Race.o
+F1-Race.obj
+F1-Race_res.o
 F1-Race.exe
 F1-Race.js
 F1-Race.data

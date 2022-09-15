@@ -20,15 +20,15 @@ Install [MSYS2](https://www.msys2.org/) first and run "MSYS2 MINGW64" shell.
 
 ```sh
 $ pacman -S mingw-w64-x86_64-make mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer
-make windows
-make windows-static # Alternative, maybe broken over time.
+mingw32-make build-windows
+mingw32-make build-windows-static # Alternative, maybe broken over time.
 ```
 
 ## Build for Linux
 
 ```sh
 $ sudo apt install build-essential libsdl2-dev libsdl2-mixer-dev
-$ make linux
+$ make build-linux
 ```
 
 ## Build for Web
@@ -37,7 +37,7 @@ Install [Emscripten](https://emscripten.org/docs/getting_started/downloads.html)
 
 ```sh
 $ source /opt/emsdk/emsdk_env.sh
-$ make web
+$ make build-web
 ```
 
 ## Other Information
