@@ -9,6 +9,8 @@ Port of the game from MTK OS to SDL2 and Emscripten.
 
 * Arrows and 4, 6, 8, 2 on Keypad – Movement.
 * Space, Return and 5 on Keypad – Fly.
+* Tab, N and 0 on Keypad – Switch MIDI.
+* M and 7 on Keypad – Mute.
 
 ## Web Demo
 
@@ -77,4 +79,4 @@ $ make build-web
 
 ## Other Information
 
-Thanks to [@nehochupechatat](https://github.com/nehochupechatat) for source.
+Thanks to [@nehochupechatat](https://github.com/nehochupechatat) for source and [@OldPhonePreservation](https://twitter.com/oldphonepreserv) for original MTK MIDIs.
