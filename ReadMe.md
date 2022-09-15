@@ -27,19 +27,19 @@ Web: Add a MIME type for WASM to serve files properly.\
 More information about this here: [Hosting a WebAssembly App
 ](https://platform.uno/docs/articles/how-to-host-a-webassembly-app.html).
 
-   Nginx: Add this to the `http` section of the configuration file:
+Nginx: Add this to the `http` section of the configuration file:
 
-   ```nginx
-   types {
-       application/wasm wasm;
-   }
-   ```
+```nginx
+types {
+    application/wasm wasm;
+}
+```
 
-   Apache: Add this to the `apache2.conf` or `httpd.conf` configuration files:
+Apache: Add this to the `apache2.conf` or `httpd.conf` configuration files:
 
-   ```apache
-   AddType application/wasm .wasm
-   ```
+```apache
+AddType application/wasm .wasm
+```
 
 ## Build for Windows
 
@@ -67,7 +67,7 @@ $ source /opt/emsdk/emsdk_env.sh
 $ make build-web
 ```
 
-## TODO
+## TODO List
 
 * Implement more detailed Game Over screen with scores when car crashes.
 
