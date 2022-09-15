@@ -14,7 +14,7 @@ Port of the game from MTK OS to SDL2 and Emscripten.
 
 ## Web Demo
 
-* [F1 Race](https://baat.exlmoto.ru/f1/).
+* [F1 Race](https://baat.exlmoto.ru/f1/) page.
 
 ## Download
 
@@ -30,8 +30,7 @@ $ ./F1-Race
 ```
 
 Web: Add a MIME type for WASM to serve files properly.\
-More information about this here: [Hosting a WebAssembly App
-](https://platform.uno/docs/articles/how-to-host-a-webassembly-app.html).
+More information about this here: [Hosting a WebAssembly App](https://platform.uno/docs/articles/how-to-host-a-webassembly-app.html).
 
 Nginx: Add this to the `http` section of the configuration file:
 
@@ -52,9 +51,10 @@ AddType application/wasm .wasm
 Install [MSYS2](https://www.msys2.org/) first and run "MSYS2 MINGW64" shell.
 
 ```sh
-$ pacman -S mingw-w64-x86_64-make mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer
-mingw32-make build-windows
-mingw32-make build-windows-static # Alternative, maybe broken over time.
+$ pacman -S mingw-w64-x86_64-make mingw-w64-x86_64-gcc
+$ pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer
+$ mingw32-make build-windows
+$ mingw32-make build-windows-static # Alternative, maybe broken over time.
 ```
 
 ## Build for Linux
