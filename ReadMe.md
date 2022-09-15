@@ -23,7 +23,8 @@ $ sudo apt install libsdl2-2.0-0 libsdl2-mixer-2.0-0
 $ ./F1-Race
 ```
 
-Web: Add a MIME type for WASM to serve files properly. More information about this here: [Hosting a WebAssembly App
+Web: Add a MIME type for WASM to serve files properly.\
+More information about this here: [Hosting a WebAssembly App
 ](https://platform.uno/docs/articles/how-to-host-a-webassembly-app.html).
 
    Nginx: Add this to the `http` section of the configuration file:
