@@ -43,150 +43,147 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 
 #include <time.h>
 
-#define WINDOW_WIDTH                               (256)
-#define WINDOW_HEIGHT                              (256)
-#define TEXTURE_WIDTH                              (128)
-#define TEXTURE_HEIGHT                             (128)
+#define WINDOW_WIDTH                                   (256)
+#define WINDOW_HEIGHT                                  (256)
+#define TEXTURE_WIDTH                                  (128)
+#define TEXTURE_HEIGHT                                 (128)
 
-#define F1RACE_PLAYER_CAR_IMAGE_SIZE_X             (15)
-#define F1RACE_PLAYER_CAR_IMAGE_SIZE_Y             (20)
-#define F1RACE_PLAYER_CAR_CARSH_IMAGE_SIZE_X       (15)
-#define F1RACE_PLAYER_CAR_CARSH_IMAGE_SIZE_Y       (25)
-#define F1RACE_PLAYER_CAR_FLY_IMAGE_SIZE_X         (23)
-#define F1RACE_PLAYER_CAR_FLY_IMAGE_SIZE_Y         (27)
-#define F1RACE_PLAYER_CAR_HEAD_LIGHT_IMAGE_SIZE_X  (7)
-#define F1RACE_PLAYER_CAR_HEAD_LIGHT_IMAGE_SIZE_Y  (15)
-#define F1RACE_PLAYER_CAR_HEAD_LIGHT_0_SHIFT       (1)
-#define F1RACE_PLAYER_CAR_HEAD_LIGHT_1_SHIFT       (7)
-#define F1RACE_OPPOSITE_CAR_TYPE_COUNT             (7)
-#define F1RACE_PLAYER_CAR_FLY_FRAME_COUNT          (10)
-#define F1RACE_OPPOSITE_CAR_0_IMAGE_SIZE_X         (17)
-#define F1RACE_OPPOSITE_CAR_0_IMAGE_SIZE_Y         (35)
-#define F1RACE_OPPOSITE_CAR_1_IMAGE_SIZE_X         (12)
-#define F1RACE_OPPOSITE_CAR_1_IMAGE_SIZE_Y         (18)
-#define F1RACE_OPPOSITE_CAR_2_IMAGE_SIZE_X         (15)
-#define F1RACE_OPPOSITE_CAR_2_IMAGE_SIZE_Y         (20)
-#define F1RACE_OPPOSITE_CAR_3_IMAGE_SIZE_X         (12)
-#define F1RACE_OPPOSITE_CAR_3_IMAGE_SIZE_Y         (18)
-#define F1RACE_OPPOSITE_CAR_4_IMAGE_SIZE_X         (17)
-#define F1RACE_OPPOSITE_CAR_4_IMAGE_SIZE_Y         (27)
-#define F1RACE_OPPOSITE_CAR_5_IMAGE_SIZE_X         (13)
-#define F1RACE_OPPOSITE_CAR_5_IMAGE_SIZE_Y         (21)
-#define F1RACE_OPPOSITE_CAR_6_IMAGE_SIZE_X         (13)
-#define F1RACE_OPPOSITE_CAR_6_IMAGE_SIZE_Y         (22)
-#define F1RACE_OPPOSITE_CAR_COUNT                  (8)
-#define F1RACE_OPPOSITE_CAR_DEFAULT_APPEAR_RATE    (2)
-#define F1RACE_MAX_FLY_COUNT                       (9)
-#define F1RACE_TIMER_ELAPSE                        (100)
-#define F1RACE_PLAYER_CAR_SHIFT                    (5)
-#define F1RACE_PLAYER_CAR_FLY_SHIFT                (2)
-#define F1RACE_DISPLAY_START_X                     (3)
-#define F1RACE_DISPLAY_START_Y                     (3)
-#define F1RACE_DISPLAY_END_X                       (124)
-#define F1RACE_DISPLAY_END_Y                       (124)
-#define F1RACE_ROAD_WIDTH                          (23)
-#define F1RACE_SEPARATOR_WIDTH                     (3)
-#define F1RACE_GRASS_WIDTH                         (7)
-#define F1RACE_STATUS_WIDTH                        (32)
-#define F1RACE_SEPARATOR_HEIGHT_SPACE              (3)
-#define F1RACE_SEPARATOR_RATIO                     (6)
-#define F1RACE_SEPARATOR_HEIGHT                    (F1RACE_SEPARATOR_HEIGHT_SPACE*F1RACE_SEPARATOR_RATIO)
-#define F1RACE_STATUS_NUMBER_WIDTH                 (4)
-#define F1RACE_STATUS_NUBBER_HEIGHT                (7)
-#define F1RACE_GRASS_0_START_X                     (F1RACE_DISPLAY_START_X)
-#define F1RACE_GRASS_0_END_X                       (F1RACE_GRASS_0_START_X + F1RACE_GRASS_WIDTH)-1
-#define F1RACE_ROAD_0_START_X                      (F1RACE_GRASS_0_START_X + F1RACE_GRASS_WIDTH)
-#define F1RACE_ROAD_0_END_X                        (F1RACE_ROAD_0_START_X + F1RACE_ROAD_WIDTH)-1
-#define F1RACE_SEPARATOR_0_START_X                 (F1RACE_ROAD_0_START_X + F1RACE_ROAD_WIDTH)
-#define F1RACE_SEPARATOR_0_END_X                   (F1RACE_SEPARATOR_0_START_X + F1RACE_SEPARATOR_WIDTH)-1
-#define F1RACE_ROAD_1_START_X                      (F1RACE_SEPARATOR_0_START_X + F1RACE_SEPARATOR_WIDTH)
-#define F1RACE_ROAD_1_END_X                        (F1RACE_ROAD_1_START_X + F1RACE_ROAD_WIDTH)-1
-#define F1RACE_SEPARATOR_1_START_X                 (F1RACE_ROAD_1_START_X + F1RACE_ROAD_WIDTH)
-#define F1RACE_SEPARATOR_1_END_X                   (F1RACE_SEPARATOR_1_START_X + F1RACE_SEPARATOR_WIDTH)-1
-#define F1RACE_ROAD_2_START_X                      (F1RACE_SEPARATOR_1_START_X + F1RACE_SEPARATOR_WIDTH)
-#define F1RACE_ROAD_2_END_X                        (F1RACE_ROAD_2_START_X + F1RACE_ROAD_WIDTH)-1
-#define F1RACE_GRASS_1_START_X                     (F1RACE_ROAD_2_START_X + F1RACE_ROAD_WIDTH)
-#define F1RACE_GRASS_1_END_X                       (F1RACE_GRASS_1_START_X + F1RACE_GRASS_WIDTH)-1
-#define F1RACE_STATUS_START_X                      (F1RACE_GRASS_1_START_X + F1RACE_GRASS_WIDTH)
-#define F1RACE_STATUS_END_X                        (F1RACE_STATUS_START_X + F1RACE_STATUS_WIDTH)
+#define F1RACE_PLAYER_CAR_IMAGE_SIZE_X                 (15)
+#define F1RACE_PLAYER_CAR_IMAGE_SIZE_Y                 (20)
+#define F1RACE_PLAYER_CAR_CARSH_IMAGE_SIZE_X           (15)
+#define F1RACE_PLAYER_CAR_CARSH_IMAGE_SIZE_Y           (25)
+#define F1RACE_PLAYER_CAR_FLY_IMAGE_SIZE_X             (23)
+#define F1RACE_PLAYER_CAR_FLY_IMAGE_SIZE_Y             (27)
+#define F1RACE_PLAYER_CAR_HEAD_LIGHT_IMAGE_SIZE_X      (7)
+#define F1RACE_PLAYER_CAR_HEAD_LIGHT_IMAGE_SIZE_Y      (15)
+#define F1RACE_PLAYER_CAR_HEAD_LIGHT_0_SHIFT           (1)
+#define F1RACE_PLAYER_CAR_HEAD_LIGHT_1_SHIFT           (7)
+#define F1RACE_OPPOSITE_CAR_TYPE_COUNT                 (7)
+#define F1RACE_PLAYER_CAR_FLY_FRAME_COUNT              (10)
+#define F1RACE_OPPOSITE_CAR_0_IMAGE_SIZE_X             (17)
+#define F1RACE_OPPOSITE_CAR_0_IMAGE_SIZE_Y             (35)
+#define F1RACE_OPPOSITE_CAR_1_IMAGE_SIZE_X             (12)
+#define F1RACE_OPPOSITE_CAR_1_IMAGE_SIZE_Y             (18)
+#define F1RACE_OPPOSITE_CAR_2_IMAGE_SIZE_X             (15)
+#define F1RACE_OPPOSITE_CAR_2_IMAGE_SIZE_Y             (20)
+#define F1RACE_OPPOSITE_CAR_3_IMAGE_SIZE_X             (12)
+#define F1RACE_OPPOSITE_CAR_3_IMAGE_SIZE_Y             (18)
+#define F1RACE_OPPOSITE_CAR_4_IMAGE_SIZE_X             (17)
+#define F1RACE_OPPOSITE_CAR_4_IMAGE_SIZE_Y             (27)
+#define F1RACE_OPPOSITE_CAR_5_IMAGE_SIZE_X             (13)
+#define F1RACE_OPPOSITE_CAR_5_IMAGE_SIZE_Y             (21)
+#define F1RACE_OPPOSITE_CAR_6_IMAGE_SIZE_X             (13)
+#define F1RACE_OPPOSITE_CAR_6_IMAGE_SIZE_Y             (22)
+#define F1RACE_OPPOSITE_CAR_COUNT                      (8)
+#define F1RACE_OPPOSITE_CAR_DEFAULT_APPEAR_RATE        (2)
+#define F1RACE_MAX_FLY_COUNT                           (9)
+#define F1RACE_TIMER_ELAPSE                            (100)
+#define F1RACE_PLAYER_CAR_SHIFT                        (5)
+#define F1RACE_PLAYER_CAR_FLY_SHIFT                    (2)
+#define F1RACE_DISPLAY_START_X                         (3)
+#define F1RACE_DISPLAY_START_Y                         (3)
+#define F1RACE_DISPLAY_END_X                           (124)
+#define F1RACE_DISPLAY_END_Y                           (124)
+#define F1RACE_ROAD_WIDTH                              (23)
+#define F1RACE_SEPARATOR_WIDTH                         (3)
+#define F1RACE_GRASS_WIDTH                             (7)
+#define F1RACE_STATUS_WIDTH                            (32)
+#define F1RACE_SEPARATOR_HEIGHT_SPACE                  (3)
+#define F1RACE_SEPARATOR_RATIO                         (6)
+#define F1RACE_SEPARATOR_HEIGHT                        (F1RACE_SEPARATOR_HEIGHT_SPACE*F1RACE_SEPARATOR_RATIO)
+#define F1RACE_STATUS_NUMBER_WIDTH                     (4)
+#define F1RACE_STATUS_NUBBER_HEIGHT                    (7)
+#define F1RACE_GRASS_0_START_X                         (F1RACE_DISPLAY_START_X)
+#define F1RACE_GRASS_0_END_X                           (F1RACE_GRASS_0_START_X + F1RACE_GRASS_WIDTH)-1
+#define F1RACE_ROAD_0_START_X                          (F1RACE_GRASS_0_START_X + F1RACE_GRASS_WIDTH)
+#define F1RACE_ROAD_0_END_X                            (F1RACE_ROAD_0_START_X + F1RACE_ROAD_WIDTH)-1
+#define F1RACE_SEPARATOR_0_START_X                     (F1RACE_ROAD_0_START_X + F1RACE_ROAD_WIDTH)
+#define F1RACE_SEPARATOR_0_END_X                       (F1RACE_SEPARATOR_0_START_X + F1RACE_SEPARATOR_WIDTH)-1
+#define F1RACE_ROAD_1_START_X                          (F1RACE_SEPARATOR_0_START_X + F1RACE_SEPARATOR_WIDTH)
+#define F1RACE_ROAD_1_END_X                            (F1RACE_ROAD_1_START_X + F1RACE_ROAD_WIDTH)-1
+#define F1RACE_SEPARATOR_1_START_X                     (F1RACE_ROAD_1_START_X + F1RACE_ROAD_WIDTH)
+#define F1RACE_SEPARATOR_1_END_X                       (F1RACE_SEPARATOR_1_START_X + F1RACE_SEPARATOR_WIDTH)-1
+#define F1RACE_ROAD_2_START_X                          (F1RACE_SEPARATOR_1_START_X + F1RACE_SEPARATOR_WIDTH)
+#define F1RACE_ROAD_2_END_X                            (F1RACE_ROAD_2_START_X + F1RACE_ROAD_WIDTH)-1
+#define F1RACE_GRASS_1_START_X                         (F1RACE_ROAD_2_START_X + F1RACE_ROAD_WIDTH)
+#define F1RACE_GRASS_1_END_X                           (F1RACE_GRASS_1_START_X + F1RACE_GRASS_WIDTH)-1
+#define F1RACE_STATUS_START_X                          (F1RACE_GRASS_1_START_X + F1RACE_GRASS_WIDTH)
+#define F1RACE_STATUS_END_X                            (F1RACE_STATUS_START_X + F1RACE_STATUS_WIDTH)
 
-#define F1RACE_RELEASE_ALL_KEY                       \
-{                                                    \
-	f1race_key_up_pressed      = SDL_FALSE;          \
-	f1race_key_down_pressed    = SDL_FALSE;          \
-	f1race_key_left_pressed    = SDL_FALSE;          \
-	f1race_key_right_pressed   = SDL_FALSE;          \
-	if(f1race_is_crashing == SDL_TRUE)               \
-		return;                                      \
-}
+#define F1RACE_RELEASE_ALL_KEY {                       \
+    f1race_key_up_pressed      = SDL_FALSE;            \
+    f1race_key_down_pressed    = SDL_FALSE;            \
+    f1race_key_left_pressed    = SDL_FALSE;            \
+    f1race_key_right_pressed   = SDL_FALSE;            \
+    if(f1race_is_crashing == SDL_TRUE)                 \
+        return;                                        \
+}                                                      \
 
-#define F1RACE_GET_NUMBER_IMAGE(value, image)        \
-{                                                    \
-   switch(value) {                                   \
-   case 0:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_0.bmp";     \
-      break;                                         \
-   case 1:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_1.bmp";     \
-      break;                                         \
-   case 2:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_2.bmp";     \
-      break;                                         \
-   case 3:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_3.bmp";     \
-      break;                                         \
-   case 4:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_4.bmp";     \
-      break;                                         \
-   case 5:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_5.bmp";     \
-      break;                                         \
-   case 6:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_6.bmp";     \
-      break;                                         \
-   case 7:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_7.bmp";     \
-      break;                                         \
-   case 8:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_8.bmp";     \
-      break;                                         \
-   case 9:                                           \
-      image = "assets/GAME_F1RACE_NUMBER_9.bmp";     \
-      break;                                         \
-   }                                                 \
-}
+#define F1RACE_GET_NUMBER_IMAGE(value, image) {        \
+    switch(value) {                                    \
+        case 0:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_0.bmp"; \
+            break;                                     \
+        case 1:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_1.bmp"; \
+            break;                                     \
+        case 2:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_2.bmp"; \
+            break;                                     \
+        case 3:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_3.bmp"; \
+            break;                                     \
+        case 4:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_4.bmp"; \
+            break;                                     \
+        case 5:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_5.bmp"; \
+            break;                                     \
+        case 6:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_6.bmp"; \
+            break;                                     \
+        case 7:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_7.bmp"; \
+            break;                                     \
+        case 8:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_8.bmp"; \
+            break;                                     \
+        case 9:                                        \
+            image = "assets/GAME_F1RACE_NUMBER_9.bmp"; \
+            break;                                     \
+    }                                                  \
+}                                                      \
 
 typedef struct {
-	int16_t pos_x;
-	int16_t pos_y;
-	int16_t dx;
-	int16_t dy;
+	Sint16 pos_x;
+	Sint16 pos_y;
+	Sint16 dx;
+	Sint16 dy;
 	const char *image;
 	const char *image_fly;
 	const char *image_head_light;
 } F1RACE_CAR_STRUCT;
 
 typedef struct {
-	int16_t dx;
-	int16_t dy;
-	int16_t speed;
-	int16_t dx_from_road;
+	Sint16 dx;
+	Sint16 dy;
+	Sint16 speed;
+	Sint16 dx_from_road;
 	const char *image;
 } F1RACE_OPPOSITE_CAR_TYPE_STRUCT;
 
 typedef struct {
-	int16_t dx;
-	int16_t dy;
-	int16_t speed;
-	int16_t dx_from_road;
+	Sint16 dx;
+	Sint16 dy;
+	Sint16 speed;
+	Sint16 dx_from_road;
 	const char *image;
-	int16_t pos_x;
-	int16_t pos_y;
-	uint8_t road_id;
+	Sint16 pos_x;
+	Sint16 pos_y;
+	Uint8 road_id;
 	SDL_bool is_empty;
 	SDL_bool is_add_score;
 } F1RACE_OPPOSITE_CAR_STRUCT;
@@ -204,21 +201,21 @@ static SDL_Renderer *render = NULL;
 static Mix_Music *music_background_new = NULL;
 static Mix_Music *music_background_old = NULL;
 static Mix_Music *music_crash = NULL;
-static int32_t volume_old = -1;
+static Sint32 volume_old = -1;
 
 static SDL_bool f1race_is_new_game = SDL_TRUE;
 static SDL_bool f1race_is_crashing = SDL_FALSE;
-static int16_t f1race_crashing_count_down;
-static int16_t f1race_separator_0_block_start_y;
-static int16_t f1race_separator_1_block_start_y;
-static int16_t f1race_last_car_road;
+static Sint16 f1race_crashing_count_down;
+static Sint16 f1race_separator_0_block_start_y;
+static Sint16 f1race_separator_1_block_start_y;
+static Sint16 f1race_last_car_road;
 static SDL_bool f1race_player_is_car_fly;
-static int16_t f1race_player_car_fly_duration;
-static int16_t f1race_score;
-static int16_t f1race_level;
-static int16_t f1race_pass;
-static int16_t f1race_fly_count;
-static int16_t f1race_fly_charger_count;
+static Sint16 f1race_player_car_fly_duration;
+static Sint16 f1race_score;
+static Sint16 f1race_level;
+static Sint16 f1race_pass;
+static Sint16 f1race_fly_count;
+static Sint16 f1race_fly_charger_count;
 
 static SDL_bool f1race_key_up_pressed = SDL_FALSE;
 static SDL_bool f1race_key_down_pressed = SDL_FALSE;
@@ -229,7 +226,7 @@ static F1RACE_CAR_STRUCT f1race_player_car;
 static F1RACE_OPPOSITE_CAR_TYPE_STRUCT f1race_opposite_car_type[F1RACE_OPPOSITE_CAR_TYPE_COUNT];
 static F1RACE_OPPOSITE_CAR_STRUCT f1race_opposite_car[F1RACE_OPPOSITE_CAR_COUNT];
 
-static void F1Race_DrawBitmap(const char *path, int32_t x, int32_t y) {
+static void F1Race_DrawBitmap(const char *path, Sint32 x, Sint32 y) {
 	SDL_Surface *bitmap = SDL_LoadBMP(path);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(render, bitmap);
 
@@ -243,19 +240,12 @@ static void F1Race_DrawBitmap(const char *path, int32_t x, int32_t y) {
 	SDL_DestroyTexture(texture);
 }
 
-/* Not Working */
-static void F1Race_LoadSfx(void *memory, uint32_t length, Mix_Music *music) {
-	SDL_RWops *sound_rwops = SDL_RWFromConstMem(memory, length);
-	music = Mix_LoadMUSType_RW(sound_rwops, MUS_OGG, SDL_FALSE);
-	SDL_FreeRW(sound_rwops);
-}
-
-static void F1Race_PlaySfx(Mix_Music *music, int32_t loop) {
+static void F1Race_PlaySfx(Mix_Music *music, Sint32 loop) {
 	Mix_PlayMusic(music, loop);
 }
 
 static void F1Race_Render_Separator(void) {
-	int16_t start_y, end_y;
+	Sint16 start_y, end_y;
 
 	SDL_Rect rectangle;
 	SDL_SetRenderDrawColor(render, 250, 250, 250, 0);
@@ -328,12 +318,12 @@ static void F1Race_Render_Road(void) {
 }
 
 static void F1Race_Render_Status(void) {
-	int16_t x_pos;
-	int16_t y_pos;
-	int16_t value;
-	int16_t remain;
-	int16_t score;
-	int16_t index;
+	Sint16 x_pos;
+	Sint16 y_pos;
+	Sint16 value;
+	Sint16 remain;
+	Sint16 score;
+	Sint16 index;
 
 	char *image_id;
 
@@ -399,8 +389,8 @@ static void F1Race_Render_Status(void) {
 }
 
 static void F1Race_Render_Player_Car(void) {
-	int16_t dx;
-	int16_t dy;
+	Sint16 dx;
+	Sint16 dy;
 
 	char *image;
 
@@ -429,7 +419,7 @@ static void F1Race_Render_Player_Car(void) {
 }
 
 static void F1Race_Render_Opposite_Car(void) {
-	int16_t index;
+	Sint16 index;
 	for (index = 0; index < F1RACE_OPPOSITE_CAR_COUNT; index++) {
 		if (f1race_opposite_car[index].is_empty == SDL_FALSE)
 			F1Race_DrawBitmap(f1race_opposite_car[index].image,
@@ -657,7 +647,7 @@ static void F1Race_Key_Fly_Pressed(void) {
 	}
 }
 
-static void F1Race_Keyboard_Key_Handler(int32_t vkey_code, int32_t key_state) {
+static void F1Race_Keyboard_Key_Handler(Sint32 vkey_code, Sint32 key_state) {
 	switch (vkey_code) {
 		case SDLK_LEFT:
 		case SDLK_KP_4:
@@ -721,16 +711,16 @@ static void F1Race_Crashing(void) {
 }
 
 static void F1Race_New_Opposite_Car(void) {
-	int16_t index;
-	int16_t validIndex = 0;
-	int16_t no_slot;
-	int16_t car_type = 0;
-	uint16_t road;
-	int16_t car_pos_x = 0;
-	int16_t car_shift;
-	int16_t enough_space;
-	int16_t rand_num;
-	int16_t speed_add;
+	Sint16 index;
+	Sint16 validIndex = 0;
+	Sint16 no_slot;
+	Sint16 car_type = 0;
+	Uint8 road;
+	Sint16 car_pos_x = 0;
+	Sint16 car_shift;
+	Sint16 enough_space;
+	Sint16 rand_num;
+	Sint16 speed_add;
 
 	no_slot = SDL_TRUE;
 	if ((rand() % F1RACE_OPPOSITE_CAR_DEFAULT_APPEAR_RATE) == 0) {
@@ -850,15 +840,15 @@ static void F1Race_New_Opposite_Car(void) {
 
 	f1race_opposite_car[validIndex].pos_x = car_pos_x;
 	f1race_opposite_car[validIndex].pos_y = F1RACE_DISPLAY_START_Y - f1race_opposite_car[validIndex].dy;
-	f1race_opposite_car[validIndex].road_id = (uint16_t) road;
+	f1race_opposite_car[validIndex].road_id = road;
 
 	f1race_last_car_road = road;
 }
 
 static void F1Race_CollisionCheck(void) {
-	int16_t index;
-	int16_t minA_x, minA_y, maxA_x, maxA_y;
-	int16_t minB_x, minB_y, maxB_x, maxB_y;
+	Sint16 index;
+	Sint16 minA_x, minA_y, maxA_x, maxA_y;
+	Sint16 minB_x, minB_y, maxB_x, maxB_y;
 
 	minA_x = f1race_player_car.pos_x - 1;
 	maxA_x = minA_x + f1race_player_car.dx - 1;
@@ -934,9 +924,9 @@ static void F1Race_CollisionCheck(void) {
 }
 
 static void F1Race_Framemove(void) {
-	int16_t shift;
-	int16_t max;
-	int16_t index;
+	Sint16 shift;
+	Sint16 max;
+	Sint16 index;
 
 	f1race_player_car_fly_duration++;
 	if (f1race_player_car_fly_duration == F1RACE_PLAYER_CAR_FLY_FRAME_COUNT)
@@ -1074,8 +1064,8 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	int result = 0;
-	if (MIX_INIT_OGG != (result = Mix_Init(MIX_INIT_OGG))) {
+	int result = Mix_Init(MIX_INIT_OGG);
+	if (result != MIX_INIT_OGG) {
 		fprintf(stderr, "Mix_Init Error: %s.\n", Mix_GetError());
 		return EXIT_FAILURE;
 	}
