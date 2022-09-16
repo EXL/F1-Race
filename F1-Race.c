@@ -126,6 +126,7 @@ typedef enum MUSIC_TRACKS {
 	MUSIC_BACKGROUND,
 	MUSIC_BACKGROUND_LOWCOST,
 	MUSIC_CRASH,
+	MUSIC_GAMEOVER,
 	MUSIC_MAX
 } MUSIC_TRACK;
 static Mix_Music *music_tracks[MUSIC_MAX] = { NULL };
@@ -233,9 +234,10 @@ static F1RACE_OPPOSITE_CAR_TYPE_STRUCT f1race_opposite_car_type[F1RACE_OPPOSITE_
 static F1RACE_OPPOSITE_CAR_STRUCT f1race_opposite_car[F1RACE_OPPOSITE_CAR_COUNT];
 
 static void Music_Load(void) {
-	music_tracks[MUSIC_BACKGROUND] = Mix_LoadMUS("assets/background_new.ogg");
-	music_tracks[MUSIC_BACKGROUND_LOWCOST] = Mix_LoadMUS("assets/background_old.ogg");
-	music_tracks[MUSIC_CRASH] = Mix_LoadMUS("assets/crash.ogg");
+	music_tracks[MUSIC_BACKGROUND] = Mix_LoadMUS("assets/GAME_F1RACE_BGM.ogg");
+	music_tracks[MUSIC_BACKGROUND_LOWCOST] = Mix_LoadMUS("assets/GAME_F1RACE_BGM_LOWCOST.ogg");
+	music_tracks[MUSIC_CRASH] = Mix_LoadMUS("assets/GAME_F1RACE_CRASH.ogg");
+	music_tracks[MUSIC_GAMEOVER] = Mix_LoadMUS("assets/GAME_F1RACE_GAMEOVER.ogg");
 }
 
 static void Music_Play(MUSIC_TRACK track, Sint32 loop) {
@@ -1076,7 +1078,7 @@ static void F1Race_Cyclic_Timer(void) {
 			F1Race_Render_Player_Car_Crash();
 		else {
 			if (f1race_crashing_count_down == 29)
-				Music_Play(MUSIC_CRASH, 0);
+				Music_Play(MUSIC_GAMEOVER, 0);
 			F1Race_Show_Game_Over_Screen();
 		}
 		if (f1race_crashing_count_down <= 0) {
