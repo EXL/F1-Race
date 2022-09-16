@@ -9,6 +9,7 @@
  *   MIT
  *
  * History:
+ *   16-Sep-2022: Implement "Game Over" screen.
  *   15-Sep-2022: Added new MIDIs, switching, and mute.
  *   15-Sep-2022: Added Windows support and icons.
  *   14-Sep-2022: Implemented Emscripten support.
@@ -793,7 +794,7 @@ static void F1Race_Crashing(void) {
 	Music_Play(MUSIC_CRASH, 0);
 
 	f1race_is_crashing = SDL_TRUE;
-	f1race_crashing_count_down = 40;
+	f1race_crashing_count_down = 50;
 }
 
 static void F1Race_New_Opposite_Car(void) {
@@ -1074,10 +1075,10 @@ static void F1Race_Cyclic_Timer(void) {
 		F1Race_Render();
 	} else {
 		f1race_crashing_count_down--;
-		if (f1race_crashing_count_down >= 30)
+		if (f1race_crashing_count_down >= 40)
 			F1Race_Render_Player_Car_Crash();
 		else {
-			if (f1race_crashing_count_down == 29)
+			if (f1race_crashing_count_down == 39)
 				Music_Play(MUSIC_GAMEOVER, 0);
 			F1Race_Show_Game_Over_Screen();
 		}
