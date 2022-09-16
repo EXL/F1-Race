@@ -73,10 +73,6 @@ $ source /opt/emsdk/emsdk_env.sh
 $ make build-web
 ```
 
-## TODO List
-
-* Implement more detailed Game Over screen with scores when car crashes.
-
 ## Other Information
 
 Thanks to [@nehochupechatat](https://github.com/nehochupechatat) for source and [@OldPhonePreservation](https://twitter.com/oldphonepreserv) for original MTK MIDIs.

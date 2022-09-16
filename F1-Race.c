@@ -161,6 +161,9 @@ typedef enum TEXTURES {
 	TEXTURE_OPPOSITE_CAR_4,
 	TEXTURE_OPPOSITE_CAR_5,
 	TEXTURE_OPPOSITE_CAR_6,
+	TEXTURE_GAMEOVER,
+	TEXTURE_GAMEOVER_FIELD,
+	TEXTURE_GAMEOVER_CRASH,
 	TEXTURE_MAX
 } TEXTURE;
 static SDL_Texture *textures[TEXTURE_MAX] = { NULL };
@@ -284,6 +287,9 @@ static void Texture_Load(void) {
 	Texture_Create_Bitmap("assets/GAME_F1RACE_OPPOSITE_CAR_4.bmp", TEXTURE_OPPOSITE_CAR_4);
 	Texture_Create_Bitmap("assets/GAME_F1RACE_OPPOSITE_CAR_5.bmp", TEXTURE_OPPOSITE_CAR_5);
 	Texture_Create_Bitmap("assets/GAME_F1RACE_OPPOSITE_CAR_6.bmp", TEXTURE_OPPOSITE_CAR_6);
+	Texture_Create_Bitmap("assets/GAME_F1RACE_GAMEOVER.bmp", TEXTURE_GAMEOVER);
+	Texture_Create_Bitmap("assets/GAME_F1RACE_GAMEOVER_CRASH.bmp", TEXTURE_GAMEOVER_CRASH);
+	Texture_Create_Bitmap("assets/GAME_F1RACE_GAMEOVER_FIELD.bmp", TEXTURE_GAMEOVER_FIELD);
 }
 
 static void Texture_Draw(Sint32 x, Sint32 y, TEXTURE texture_id) {
@@ -299,6 +305,31 @@ static void Texture_Unload(void) {
 	for (; i < TEXTURE_MAX; ++i)
 		if (textures[i])
 			SDL_DestroyTexture(textures[i]);
+}
+
+static void F1Race_Render_Score(Sint16 x_pos, Sint16 y_pos);
+
+static void F1Race_Show_Game_Over_Screen(void) {
+	SDL_SetRenderDrawColor(render, 234, 243, 255, 0); // Light Blue.
+	SDL_RenderClear(render);
+
+	Texture_Draw(18, 10, TEXTURE_GAMEOVER);
+	Texture_Draw(30, 40, TEXTURE_GAMEOVER_FIELD);
+
+	SDL_Rect rectangle;
+	SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
+	rectangle.x = 33;
+	rectangle.y = 43;
+	rectangle.w = 64;
+	rectangle.h = 20;
+	SDL_RenderFillRect(render, &rectangle);
+
+	Texture_Draw(36, 50, TEXTURE_STATUS_SCORE);
+	Texture_Draw(65, 48, TEXTURE_STATUS_BOX);
+
+	F1Race_Render_Score(64, -2);
+
+	Texture_Draw(47, 80, TEXTURE_GAMEOVER_CRASH);
 }
 
 static void F1Race_Render_Separator(void) {
@@ -374,31 +405,23 @@ static void F1Race_Render_Road(void) {
 	SDL_RenderFillRect(render, &rectangle);
 }
 
-static void F1Race_Render_Status(void) {
-	Sint16 x_pos;
-	Sint16 y_pos;
+static void F1Race_Render_Score(Sint16 x_pos, Sint16 y_pos) {
 	Sint16 value;
 	Sint16 remain;
-	Sint16 score;
-	Sint16 index;
 
 	SDL_Rect rectangle;
 	SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
-	rectangle.x = F1RACE_STATUS_START_X + 4;
-	rectangle.y = F1RACE_DISPLAY_START_Y + 52;
-	rectangle.w = F1RACE_STATUS_START_X + 29 + 1 - rectangle.x;
-	rectangle.h = F1RACE_DISPLAY_START_Y + 58 - rectangle.y;
+	rectangle.x = x_pos + 4;
+	rectangle.y = y_pos + 52;
+	rectangle.w = x_pos + 29 + 1 - rectangle.x;
+	rectangle.h = y_pos + 58 - rectangle.y;
 	SDL_RenderFillRect(render, &rectangle);
 
-	x_pos = F1RACE_STATUS_START_X + 25;
-	y_pos = F1RACE_DISPLAY_START_Y + 52;
-
-	score = f1race_score;
-	value = score % 10;
-	remain = score / 10;
+	value = f1race_score % 10;
+	remain = f1race_score / 10;
 
 	while (SDL_TRUE) {
-		Texture_Draw(x_pos, y_pos, value);
+		Texture_Draw(x_pos + 25, y_pos + 52, value);
 
 		x_pos -= 5;
 		if (remain > 0) {
@@ -408,7 +431,16 @@ static void F1Race_Render_Status(void) {
 		else
 			break;
 	}
+}
 
+static void F1Race_Render_Status(void) {
+	Sint16 x_pos;
+	Sint16 y_pos;
+	Sint16 index;
+
+	F1Race_Render_Score(F1RACE_STATUS_START_X, F1RACE_DISPLAY_START_Y);
+
+	SDL_Rect rectangle;
 	SDL_SetRenderDrawColor(render, 0, 0, 0, 0);
 	rectangle.x = F1RACE_STATUS_START_X + 4;
 	rectangle.y = F1RACE_DISPLAY_START_Y + 74;
@@ -759,7 +791,7 @@ static void F1Race_Crashing(void) {
 	Music_Play(MUSIC_CRASH, 0);
 
 	f1race_is_crashing = SDL_TRUE;
-	f1race_crashing_count_down = 10;
+	f1race_crashing_count_down = 40;
 }
 
 static void F1Race_New_Opposite_Car(void) {
@@ -1040,11 +1072,16 @@ static void F1Race_Cyclic_Timer(void) {
 		F1Race_Render();
 	} else {
 		f1race_crashing_count_down--;
-		F1Race_Render_Player_Car_Crash();
+		if (f1race_crashing_count_down >= 30)
+			F1Race_Render_Player_Car_Crash();
+		else {
+			if (f1race_crashing_count_down == 29)
+				Music_Play(MUSIC_CRASH, 0);
+			F1Race_Show_Game_Over_Screen();
+		}
 		if (f1race_crashing_count_down <= 0) {
 			f1race_is_crashing = SDL_FALSE;
 			f1race_is_new_game = SDL_TRUE;
-
 			F1Race_Main();
 		}
 	}
@@ -1099,7 +1136,7 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	SDL_Surface *icon = SDL_LoadBMP("assets/race.bmp");
+	SDL_Surface *icon = SDL_LoadBMP("assets/GAME_F1RACE_ICON.bmp");
 	if (icon == NULL)
 		fprintf(stderr, "SDL_LoadBMP Error: %s.\n", SDL_GetError());
 	else {
