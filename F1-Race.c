@@ -198,9 +198,13 @@ static SDL_bool exit_main_loop = SDL_FALSE;
 static SDL_bool using_new_background_ogg = SDL_FALSE;
 static SDL_Renderer *render = NULL;
 
-static Mix_Music *music_background_new = NULL;
-static Mix_Music *music_background_old = NULL;
-static Mix_Music *music_crash = NULL;
+typedef enum MUSIC_TRACKS {
+	MUSIC_BACKGROUND,
+	MUSIC_BACKGROUND_LOWCOST,
+	MUSIC_CRASH,
+	MUSIC_MAX
+} MUSIC_TRACK;
+static Mix_Music *music_tracks[MUSIC_MAX];
 static Sint32 volume_old = -1;
 
 static SDL_bool f1race_is_new_game = SDL_TRUE;
@@ -226,6 +230,23 @@ static F1RACE_CAR_STRUCT f1race_player_car;
 static F1RACE_OPPOSITE_CAR_TYPE_STRUCT f1race_opposite_car_type[F1RACE_OPPOSITE_CAR_TYPE_COUNT];
 static F1RACE_OPPOSITE_CAR_STRUCT f1race_opposite_car[F1RACE_OPPOSITE_CAR_COUNT];
 
+static void Music_Load(void) {
+	music_tracks[MUSIC_BACKGROUND] = Mix_LoadMUS("assets/background_new.ogg");
+	music_tracks[MUSIC_BACKGROUND_LOWCOST] = Mix_LoadMUS("assets/background_old.ogg");
+	music_tracks[MUSIC_CRASH] = Mix_LoadMUS("assets/crash.ogg");
+}
+
+static void Music_Play(MUSIC_TRACK track, Sint32 loop) {
+	Mix_PlayMusic(music_tracks[track], loop);
+}
+
+static void Music_Unload(void) {
+	int i = 0;
+	for (; i < MUSIC_MAX; ++i)
+		if (music_tracks[i])
+			Mix_FreeMusic(music_tracks[i]);
+}
+
 static void F1Race_DrawBitmap(const char *path, Sint32 x, Sint32 y) {
 	SDL_Surface *bitmap = SDL_LoadBMP(path);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(render, bitmap);
@@ -238,10 +259,6 @@ static void F1Race_DrawBitmap(const char *path, Sint32 x, Sint32 y) {
 
 	SDL_FreeSurface(bitmap);
 	SDL_DestroyTexture(texture);
-}
-
-static void F1Race_PlaySfx(Mix_Music *music, Sint32 loop) {
-	Mix_PlayMusic(music, loop);
 }
 
 static void F1Race_Render_Separator(void) {
@@ -595,9 +612,9 @@ static void F1Race_Main(void) {
 	F1Race_Render();
 
 	if (using_new_background_ogg)
-		F1Race_PlaySfx(music_background_new, -1);
+		Music_Play(MUSIC_BACKGROUND, -1);
 	else
-		F1Race_PlaySfx(music_background_old, -1);
+		Music_Play(MUSIC_BACKGROUND_LOWCOST, -1);
 }
 
 static void F1Race_Key_Left_Pressed(void) {
@@ -677,9 +694,9 @@ static void F1Race_Keyboard_Key_Handler(Sint32 vkey_code, Sint32 key_state) {
 		case SDLK_KP_0:
 			if (key_state) {
 				if (!using_new_background_ogg)
-					F1Race_PlaySfx(music_background_new, -1);
+					Music_Play(MUSIC_BACKGROUND, -1);
 				else
-					F1Race_PlaySfx(music_background_old, -1);
+					Music_Play(MUSIC_BACKGROUND_LOWCOST, -1);
 				using_new_background_ogg = !using_new_background_ogg;
 			}
 			break;
@@ -704,7 +721,7 @@ static void F1Race_Keyboard_Key_Handler(Sint32 vkey_code, Sint32 key_state) {
 /* === LOGIC CODE === */
 
 static void F1Race_Crashing(void) {
-	F1Race_PlaySfx(music_crash, 0);
+	Music_Play(MUSIC_CRASH, 0);
 
 	f1race_is_crashing = SDL_TRUE;
 	f1race_crashing_count_down = 10;
@@ -1074,12 +1091,7 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	music_background_new = Mix_LoadMUS("assets/background_new.ogg");
-	music_background_old = Mix_LoadMUS("assets/background_old.ogg");
-	music_crash = Mix_LoadMUS("assets/crash.ogg");
-//	F1Race_LoadSfx(assets_background_new_ogg, assets_background_new_ogg_len, music_background_new);
-//	F1Race_LoadSfx(assets_background_old_ogg, assets_background_old_ogg_len, music_background_old);
-//	F1Race_LoadSfx(assets_crash_ogg, assets_crash_ogg_len, music_crash);
+	Music_Load();
 
 	SDL_Texture *texture = SDL_CreateTexture(render, SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET, TEXTURE_WIDTH, TEXTURE_HEIGHT);
@@ -1100,12 +1112,7 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 #endif
 
 	Mix_CloseAudio();
-	if (music_crash)
-		Mix_FreeMusic(music_crash);
-	if (music_background_old)
-		Mix_FreeMusic(music_background_old);
-	if (music_background_new)
-		Mix_FreeMusic(music_background_new);
+	Music_Unload();
 
 	SDL_DestroyTexture(texture);
 	SDL_DestroyRenderer(render);
