@@ -745,22 +745,26 @@ static void F1Race_Keyboard_Key_Handler(Sint32 vkey_code, Sint32 key_state) {
 			(key_state) ? F1Race_Key_Right_Pressed() : F1Race_Key_Right_Released();
 			break;
 		case SDLK_UP:
-		case SDLK_KP_2:
+		case SDLK_2:
+		case SDLK_KP_8:
 			(key_state) ? F1Race_Key_Up_Pressed() : F1Race_Key_Up_Released();
 			break;
 		case SDLK_DOWN:
-		case SDLK_KP_8:
+		case SDLK_8:
+		case SDLK_KP_2:
 			(key_state) ? F1Race_Key_Down_Pressed() : F1Race_Key_Down_Released();
 			break;
 		case SDLK_SPACE:
 		case SDLK_RETURN:
 		case SDLK_KP_ENTER:
+		case SDLK_5:
 		case SDLK_KP_5:
 			if (key_state)
 				F1Race_Key_Fly_Pressed();
 			break;
 		case SDLK_n:
 		case SDLK_TAB:
+		case SDLK_0:
 		case SDLK_KP_0:
 			if (key_state) {
 				if (!using_new_background_ogg)
@@ -771,6 +775,7 @@ static void F1Race_Keyboard_Key_Handler(Sint32 vkey_code, Sint32 key_state) {
 			}
 			break;
 		case SDLK_m:
+		case SDLK_7:
 		case SDLK_KP_7:
 			if (key_state) {
 				if (volume_old == -1)

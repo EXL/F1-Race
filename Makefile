@@ -20,6 +20,7 @@ build-windows-static:
 
 build-web:
 	emcc --use-preload-plugins --preload-file assets F1-Race.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
+	emstrip -s F1-Race.wasm
 
 clean:
 	-rm -f F1-Race

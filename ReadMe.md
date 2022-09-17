@@ -14,7 +14,7 @@ Port of the game from MTK OS to SDL2 and Emscripten.
 
 ## Web Demo
 
-* [F1 Race](https://baat.exlmoto.ru/f1/) page.
+* [F1 Race](https://lab.exlmoto.ru/f1/) page.
 
 ## Download
 
