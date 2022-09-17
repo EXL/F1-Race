@@ -19,7 +19,7 @@ build-windows-static:
 	strip -s F1-Race.exe
 
 build-web:
-	emcc --use-preload-plugins --preload-file assets F1-Race.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
+	emcc -02 --use-preload-plugins --preload-file assets F1-Race.c -s USE_SDL=2 -s USE_SDL_MIXER=2 -o F1-Race.html
 	emstrip -s F1-Race.wasm
 
 clean:
