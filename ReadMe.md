@@ -3,14 +3,14 @@ F1 Race
 
 ![Screenshot from Windows 10](images/screenshot-windows.png)
 
-Port of the game from MTK OS to SDL2 and Emscripten.
+A port of the simple race game from MTK OS to SDL2 and Emscripten.
 
 ## Controls
 
 * Arrows and 4, 6, 8, 2 on Keypad – Movement.
 * Space, Return and 5 on Keypad – Fly.
 * Tab, N and 0 on Keypad – Switch MIDI.
-* M and 7 on Keypad – Mute.
+* M and 7 on Keypad – Mute sound.
 
 ## Web Demo
 
