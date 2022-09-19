@@ -22,7 +22,7 @@ Ready-to-run game builds are available in the "[Releases](https://github.com/EXL
 
 ## Run Tips
 
-Linux: Install the SDL2 and SDL2_mixer libraries before starting the game.
+Linux, Ubuntu 22.04 LTS: Install the SDL2 and SDL2_mixer libraries before starting the game.
 
 ```sh
 $ sudo apt install libsdl2-2.0-0 libsdl2-mixer-2.0-0
