@@ -9,7 +9,8 @@
  *   MIT
  *
  * History:
- *   16-Sep-2022: Implement "Game Over" screen.
+ *   19-Sep-2022: Implemented screen resizing on Phantom Horror request.
+ *   16-Sep-2022: Implemented "Game Over" screen.
  *   15-Sep-2022: Added new MIDIs, switching, and mute.
  *   15-Sep-2022: Added Windows support and icons.
  *   14-Sep-2022: Implemented Emscripten support.
@@ -1137,8 +1138,12 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	// Enable smoothing for old-style pixel-art game.
+	// SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
 	SDL_Window *window = SDL_CreateWindow("F1 Race",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT,
+		SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 	if (window == NULL) {
 		fprintf(stderr, "SDL_CreateWindow Error: %s.\n", SDL_GetError());
 		return EXIT_FAILURE;
@@ -1183,12 +1188,12 @@ int main(SDL_UNUSED int argc, SDL_UNUSED char *argv[]) {
 #ifndef __EMSCRIPTEN__
 	while (!exit_main_loop) {
 		main_loop(textures[TEXTURE_SCREEN]);
-		SDL_Delay(F1RACE_TIMER_ELAPSE); // 10 fps.
+		SDL_Delay(F1RACE_TIMER_ELAPSE); // 10 FPS.
 	}
 #else
 	CONTEXT_EMSCRIPTEN context;
 	context.texture = textures[TEXTURE_SCREEN];
-	emscripten_set_main_loop_arg(main_loop_emscripten, &context, 10, 1); // 10 fps.
+	emscripten_set_main_loop_arg(main_loop_emscripten, &context, 10, 1); // 10 FPS.
 #endif
 
 	Mix_CloseAudio();
